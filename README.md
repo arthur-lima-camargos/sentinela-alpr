@@ -11,7 +11,7 @@ consulta o histórico e dispara **alertas** quando uma placa monitorada é vista
 
 ## Objetivos
 
-- Aprender, na prática, uma stack moderna de **Java 21 / Spring Boot 3**,
+- Aprender, na prática, uma stack moderna de **Java 21 / Spring Boot 4**,
   **Angular** e **PostgreSQL**.
 - Construir uma API bem modelada, com boas fronteiras de domínio.
 - **Demonstrar desempenho** com milhões de registros (indexação, paginação
@@ -20,10 +20,10 @@ consulta o histórico e dispara **alertas** quando uma placa monitorada é vista
 
 ## Stack
 
-- **Backend:** Java 21 (LTS) + Spring Boot 3.x, Maven (via Wrapper)
+- **Backend:** Java 21 (LTS) + Spring Boot 4.x, Maven (via Wrapper)
 - **Banco:** PostgreSQL + Flyway (migrations em SQL puro)
 - **Frontend:** Angular (última estável, standalone) + WebSocket/STOMP
-- **Segurança:** Spring Security 6 + JWT
+- **Segurança:** Spring Security 7 + JWT
 - **Testes:** JUnit 5 + Mockito + Testcontainers; carga com k6
 
 ## Funcionalidades (MVP)
@@ -41,7 +41,7 @@ consulta o histórico e dispara **alertas** quando uma placa monitorada é vista
 |:-:|-----------------------------|----------------|
 | 0 | Arquitetura e planejamento  | ✅ Concluído    |
 | 1 | Ambiente                    | ✅ Concluído    |
-| 2 | Scaffold                    | 🟡 Em andamento |
+| 2 | Scaffold                    | ✅ Concluído    |
 | 3 | Domínio                     | ⚪ Pendente     |
 | 4 | Segurança (JWT)             | ⚪ Pendente     |
 | 5 | Desempenho                  | ⚪ Pendente     |
@@ -87,5 +87,7 @@ exibe ao vivo, com destaque visual de urgência.
 
 ## Status atual
 
-Ambiente pronto (JDK 21, Node, Docker, VS Code) e **PostgreSQL rodando via
-Docker**. Próximo passo: scaffold do backend (Spring Boot) e do frontend (Angular).
+Ambiente e **scaffold prontos**: backend Spring Boot 4 (compila, conecta no
+Postgres, migration V1 aplicada) e frontend Angular 22 (build ok), com CI no
+GitHub Actions. Próximo passo: **Fase 3 — domínio** (módulos de câmeras,
+passagens, watchlist e alertas).

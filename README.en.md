@@ -11,7 +11,7 @@ queries the history, and raises **alerts** when a monitored plate is seen.
 
 ## Goals
 
-- Learn a modern **Java 21 / Spring Boot 3**, **Angular** and **PostgreSQL**
+- Learn a modern **Java 21 / Spring Boot 4**, **Angular** and **PostgreSQL**
   stack in practice.
 - Build a well-modeled API with clear domain boundaries.
 - **Demonstrate performance** with millions of records (indexing, efficient
@@ -20,10 +20,10 @@ queries the history, and raises **alerts** when a monitored plate is seen.
 
 ## Stack
 
-- **Backend:** Java 21 (LTS) + Spring Boot 3.x, Maven (via Wrapper)
+- **Backend:** Java 21 (LTS) + Spring Boot 4.x, Maven (via Wrapper)
 - **Database:** PostgreSQL + Flyway (plain SQL migrations)
 - **Frontend:** Angular (latest stable, standalone) + WebSocket/STOMP
-- **Security:** Spring Security 6 + JWT
+- **Security:** Spring Security 7 + JWT
 - **Testing:** JUnit 5 + Mockito + Testcontainers; load testing with k6
 
 ## Features (MVP)
@@ -41,7 +41,7 @@ queries the history, and raises **alerts** when a monitored plate is seen.
 |:-:|-----------------------------|-----------------|
 | 0 | Architecture & planning     | ✅ Done          |
 | 1 | Environment                 | ✅ Done          |
-| 2 | Scaffold                    | 🟡 In progress  |
+| 2 | Scaffold                    | ✅ Done          |
 | 3 | Domain                      | ⚪ Pending      |
 | 4 | Security (JWT)              | ⚪ Pending      |
 | 5 | Performance                 | ⚪ Pending      |
@@ -87,5 +87,7 @@ dashboard shows them live, with visual urgency highlighting.
 
 ## Current status
 
-Environment ready (JDK 21, Node, Docker, VS Code) and **PostgreSQL running via
-Docker**. Next step: scaffold the backend (Spring Boot) and the frontend (Angular).
+Environment and **scaffold ready**: Spring Boot 4 backend (compiles, connects to
+Postgres, migration V1 applied) and Angular 22 frontend (build ok), with CI on
+GitHub Actions. Next step: **Phase 3 — domain** (cameras, passages, watchlist and
+alerts modules).
