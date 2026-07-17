@@ -11,7 +11,7 @@ consulta o histórico e dispara **alertas** quando uma placa monitorada é vista
 
 ## Objetivos
 
-- Aprender, na prática, uma stack moderna de **Java 17 / Spring Boot 3**,
+- Aprender, na prática, uma stack moderna de **Java 21 / Spring Boot 3**,
   **Angular** e **PostgreSQL**.
 - Construir uma API bem modelada, com boas fronteiras de domínio.
 - **Demonstrar desempenho** com milhões de registros (indexação, paginação
@@ -20,7 +20,7 @@ consulta o histórico e dispara **alertas** quando uma placa monitorada é vista
 
 ## Stack
 
-- **Backend:** Java 17 (LTS) + Spring Boot 3.x, Maven (via Wrapper)
+- **Backend:** Java 21 (LTS) + Spring Boot 3.x, Maven (via Wrapper)
 - **Banco:** PostgreSQL + Flyway (migrations em SQL puro)
 - **Frontend:** Angular (última estável, standalone) + WebSocket/STOMP
 - **Segurança:** Spring Security 6 + JWT
@@ -40,8 +40,8 @@ consulta o histórico e dispara **alertas** quando uma placa monitorada é vista
 | # | Fase                        | Status         |
 |:-:|-----------------------------|----------------|
 | 0 | Arquitetura e planejamento  | ✅ Concluído    |
-| 1 | Ambiente                    | ⚪ Pendente     |
-| 2 | Scaffold                    | ⚪ Pendente     |
+| 1 | Ambiente                    | ✅ Concluído    |
+| 2 | Scaffold                    | 🟡 Em andamento |
 | 3 | Domínio                     | ⚪ Pendente     |
 | 4 | Segurança (JWT)             | ⚪ Pendente     |
 | 5 | Desempenho                  | ⚪ Pendente     |
@@ -56,13 +56,15 @@ Definição de stack, estilo arquitetural (monólito modular), escopo do MVP, mo
 de domínio e de dados, e estratégias de desempenho, concorrência e testes.
 
 **Fase 1 — Ambiente**
-Instalar JDK 17, Node LTS, Docker Desktop e VS Code (com extensões); criar o
+Instalar/validar JDK 21, Node LTS, Docker Desktop e VS Code (com extensões); criar o
 `docker-compose.yml` do PostgreSQL de desenvolvimento e validar cada ferramenta.
 
 **Fase 2 — Scaffold**
 Esqueleto dos projetos: backend Spring Boot (Maven Wrapper, estrutura por módulo,
 `application.yml`), frontend Angular (`core/ shared/ features/`) e a migration
 inicial do schema. Validar que backend sobe, conecta no banco e o frontend serve.
+Inclui a configuração da **Integração Contínua** (GitHub Actions), validando build
+e testes a cada push.
 
 **Fase 3 — Domínio**
 Regra de negócio dos módulos: câmeras (CRUD), passagens (registro + consulta por
@@ -85,5 +87,5 @@ exibe ao vivo, com destaque visual de urgência.
 
 ## Status atual
 
-Arquitetura **definida**; implementação ainda **não iniciada**. Próximo passo:
-preparar o ambiente de desenvolvimento.
+Ambiente pronto (JDK 21, Node, Docker, VS Code) e **PostgreSQL rodando via
+Docker**. Próximo passo: scaffold do backend (Spring Boot) e do frontend (Angular).

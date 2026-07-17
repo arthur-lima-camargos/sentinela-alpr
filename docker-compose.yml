@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:16
+    container_name: sentinela-db
+    environment:
+      POSTGRES_DB: sentinela
+      POSTGRES_USER: sentinela
+      POSTGRES_PASSWORD: sentinela
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sentinela -d sentinela"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:

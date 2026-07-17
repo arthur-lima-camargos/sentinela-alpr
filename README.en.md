@@ -11,7 +11,7 @@ queries the history, and raises **alerts** when a monitored plate is seen.
 
 ## Goals
 
-- Learn a modern **Java 17 / Spring Boot 3**, **Angular** and **PostgreSQL**
+- Learn a modern **Java 21 / Spring Boot 3**, **Angular** and **PostgreSQL**
   stack in practice.
 - Build a well-modeled API with clear domain boundaries.
 - **Demonstrate performance** with millions of records (indexing, efficient
@@ -20,7 +20,7 @@ queries the history, and raises **alerts** when a monitored plate is seen.
 
 ## Stack
 
-- **Backend:** Java 17 (LTS) + Spring Boot 3.x, Maven (via Wrapper)
+- **Backend:** Java 21 (LTS) + Spring Boot 3.x, Maven (via Wrapper)
 - **Database:** PostgreSQL + Flyway (plain SQL migrations)
 - **Frontend:** Angular (latest stable, standalone) + WebSocket/STOMP
 - **Security:** Spring Security 6 + JWT
@@ -40,8 +40,8 @@ queries the history, and raises **alerts** when a monitored plate is seen.
 | # | Phase                       | Status          |
 |:-:|-----------------------------|-----------------|
 | 0 | Architecture & planning     | ✅ Done          |
-| 1 | Environment                 | ⚪ Pending      |
-| 2 | Scaffold                    | ⚪ Pending      |
+| 1 | Environment                 | ✅ Done          |
+| 2 | Scaffold                    | 🟡 In progress  |
 | 3 | Domain                      | ⚪ Pending      |
 | 4 | Security (JWT)              | ⚪ Pending      |
 | 5 | Performance                 | ⚪ Pending      |
@@ -56,14 +56,15 @@ Definition of the stack, architectural style (modular monolith), MVP scope,
 domain and data models, and the performance, concurrency and testing strategies.
 
 **Phase 1 — Environment**
-Install JDK 17, Node LTS, Docker Desktop and VS Code (with extensions); create the
+Install/validate JDK 21, Node LTS, Docker Desktop and VS Code (with extensions); create the
 `docker-compose.yml` for the development PostgreSQL and validate each tool.
 
 **Phase 2 — Scaffold**
 Project skeletons: Spring Boot backend (Maven Wrapper, per-module structure,
 `application.yml`), Angular frontend (`core/ shared/ features/`) and the initial
 schema migration. Verify the backend boots, connects to the database and the
-frontend serves.
+frontend serves. Includes **Continuous Integration** setup (GitHub Actions),
+validating build and tests on every push.
 
 **Phase 3 — Domain**
 Business logic of the modules: cameras (CRUD), passages (recording + keyset query
@@ -86,5 +87,5 @@ dashboard shows them live, with visual urgency highlighting.
 
 ## Current status
 
-Architecture **defined**; implementation **not started** yet. Next step: prepare
-the development environment.
+Environment ready (JDK 21, Node, Docker, VS Code) and **PostgreSQL running via
+Docker**. Next step: scaffold the backend (Spring Boot) and the frontend (Angular).
