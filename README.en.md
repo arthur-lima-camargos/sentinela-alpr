@@ -1,0 +1,90 @@
+# Sentinela ALPR
+
+[🇧🇷 Português](README.md) &nbsp;|&nbsp; 🇺🇸 English
+
+**Vehicle monitoring system based on Automatic License Plate Recognition (ALPR)**
+for a public-safety scenario. It records vehicle passages captured by cameras,
+queries the history, and raises **alerts** when a monitored plate is seen.
+
+> Plate recognition (OCR) is out of scope: the system receives the **already
+> recognized** plate via REST, simulating the cameras.
+
+## Goals
+
+- Learn a modern **Java 17 / Spring Boot 3**, **Angular** and **PostgreSQL**
+  stack in practice.
+- Build a well-modeled API with clear domain boundaries.
+- **Demonstrate performance** with millions of records (indexing, efficient
+  pagination and load testing).
+- Exercise concurrency and collisions under near real-world conditions.
+
+## Stack
+
+- **Backend:** Java 17 (LTS) + Spring Boot 3.x, Maven (via Wrapper)
+- **Database:** PostgreSQL + Flyway (plain SQL migrations)
+- **Frontend:** Angular (latest stable, standalone) + WebSocket/STOMP
+- **Security:** Spring Security 6 + JWT
+- **Testing:** JUnit 5 + Mockito + Testcontainers; load testing with k6
+
+## Features (MVP)
+
+1. Camera registration (capture points)
+2. Passage recording (plate reads)
+3. Passage querying (by plate, camera and time range)
+4. Watchlist of monitored vehicles
+5. Automatic alerts when a monitored plate is detected
+6. Dashboard with real-time alerts
+
+## Progress
+
+| # | Phase                       | Status          |
+|:-:|-----------------------------|-----------------|
+| 0 | Architecture & planning     | ✅ Done          |
+| 1 | Environment                 | ⚪ Pending      |
+| 2 | Scaffold                    | ⚪ Pending      |
+| 3 | Domain                      | ⚪ Pending      |
+| 4 | Security (JWT)              | ⚪ Pending      |
+| 5 | Performance                 | ⚪ Pending      |
+| 6 | Real time                   | ⚪ Pending      |
+
+**Legend:** ✅ done · 🟡 in progress · ⚪ pending
+
+## Phase details
+
+**Phase 0 — Architecture & planning**
+Definition of the stack, architectural style (modular monolith), MVP scope,
+domain and data models, and the performance, concurrency and testing strategies.
+
+**Phase 1 — Environment**
+Install JDK 17, Node LTS, Docker Desktop and VS Code (with extensions); create the
+`docker-compose.yml` for the development PostgreSQL and validate each tool.
+
+**Phase 2 — Scaffold**
+Project skeletons: Spring Boot backend (Maven Wrapper, per-module structure,
+`application.yml`), Angular frontend (`core/ shared/ features/`) and the initial
+schema migration. Verify the backend boots, connects to the database and the
+frontend serves.
+
+**Phase 3 — Domain**
+Business logic of the modules: cameras (CRUD), passages (recording + keyset query
++ event), watchlist (CRUD) and alerts (matching + status). With DTOs, validation,
+error handling (`ProblemDetail`) and tests.
+
+**Phase 4 — Security (JWT)**
+Backend: user, stateless authentication, login issuing a JWT, roles and BCrypt
+password hashing. Frontend: login screen, token interceptor, route guards and
+expired-session handling.
+
+**Phase 5 — Performance**
+Deterministic base scenario and a 5–10M passage seed; index validation with
+`EXPLAIN ANALYZE`; concurrency tests; load testing with k6 (latency and
+throughput); camera simulator.
+
+**Phase 6 — Real time**
+WebSocket/STOMP: the backend publishes alerts to `/topic/alertas` and the
+dashboard shows them live, with visual urgency highlighting.
+
+## Current status
+
+Architecture **defined**; implementation **not started** yet. Next step: prepare
+the development environment.
