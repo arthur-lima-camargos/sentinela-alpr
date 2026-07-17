@@ -3,7 +3,7 @@
 [🇧🇷 Português](README.md) &nbsp;|&nbsp; 🇺🇸 English
 
 **Vehicle monitoring system based on Automatic License Plate Recognition (ALPR)**
-for a public-safety scenario. It records vehicle passages captured by cameras,
+for a public-safety scenario. It records vehicle detections captured by cameras,
 queries the history, and raises **alerts** when a monitored plate is seen.
 
 > Plate recognition (OCR) is out of scope: the system receives the **already
@@ -29,8 +29,8 @@ queries the history, and raises **alerts** when a monitored plate is seen.
 ## Features (MVP)
 
 1. Camera registration (capture points)
-2. Passage recording (plate reads)
-3. Passage querying (by plate, camera and time range)
+2. Detection recording (plate reads)
+3. Detection querying (by plate, camera and time range)
 4. Watchlist of monitored vehicles
 5. Automatic alerts when a monitored plate is detected
 6. Dashboard with real-time alerts
@@ -67,7 +67,7 @@ frontend serves. Includes **Continuous Integration** setup (GitHub Actions),
 validating build and tests on every push.
 
 **Phase 3 — Domain**
-Business logic of the modules: cameras (CRUD), passages (recording + keyset query
+Business logic of the modules: cameras (CRUD), detections (recording + keyset query
 + event), watchlist (CRUD) and alerts (matching + status). With DTOs, validation,
 error handling (`ProblemDetail`) and tests.
 
@@ -77,17 +77,17 @@ password hashing. Frontend: login screen, token interceptor, route guards and
 expired-session handling.
 
 **Phase 5 — Performance**
-Deterministic base scenario and a 5–10M passage seed; index validation with
+Deterministic base scenario and a 5–10M detection seed; index validation with
 `EXPLAIN ANALYZE`; concurrency tests; load testing with k6 (latency and
 throughput); camera simulator.
 
 **Phase 6 — Real time**
-WebSocket/STOMP: the backend publishes alerts to `/topic/alertas` and the
+WebSocket/STOMP: the backend publishes alerts to `/topic/alerts` and the
 dashboard shows them live, with visual urgency highlighting.
 
 ## Current status
 
 Environment and **scaffold ready**: Spring Boot 4 backend (compiles, connects to
 Postgres, migration V1 applied) and Angular 22 frontend (build ok), with CI on
-GitHub Actions. Next step: **Phase 3 — domain** (cameras, passages, watchlist and
+GitHub Actions. Next step: **Phase 3 — domain** (cameras, detections, watchlist and
 alerts modules).

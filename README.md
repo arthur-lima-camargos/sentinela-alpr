@@ -82,7 +82,7 @@ Cenário base determinístico e seed de 5–10M passagens; validação de índic
 simulador de câmeras.
 
 **Fase 6 — Tempo real**
-WebSocket/STOMP: o backend publica alertas em `/topic/alertas` e o dashboard os
+WebSocket/STOMP: o backend publica alertas em `/topic/alerts` e o dashboard os
 exibe ao vivo, com destaque visual de urgência.
 
 ## Status atual
