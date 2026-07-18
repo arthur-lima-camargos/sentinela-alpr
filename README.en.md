@@ -42,7 +42,7 @@ queries the history, and raises **alerts** when a monitored plate is seen.
 | 0 | Architecture & planning     | ✅ Done          |
 | 1 | Environment                 | ✅ Done          |
 | 2 | Scaffold                    | ✅ Done          |
-| 3 | Domain                      | ⚪ Pending      |
+| 3 | Domain                      | ✅ Done          |
 | 4 | Security (JWT)              | ⚪ Pending      |
 | 5 | Performance                 | ⚪ Pending      |
 | 6 | Real time                   | ⚪ Pending      |
@@ -87,7 +87,11 @@ dashboard shows them live, with visual urgency highlighting.
 
 ## Current status
 
-Environment and **scaffold ready**: Spring Boot 4 backend (compiles, connects to
-Postgres, migration V1 applied) and Angular 22 frontend (build ok), with CI on
-GitHub Actions. Next step: **Phase 3 — domain** (cameras, detections, watchlist and
-alerts modules).
+**Domain implemented (Phase 3):** the four business modules — cameras (CRUD),
+detections (record + **keyset** query + domain event), watchlist (CRUD, normalized
+plate) and alerts (automatic matching + status) — with `record` DTOs, Bean
+Validation, `ProblemDetail` errors and the cross-cutting infra
+(`GlobalExceptionHandler`, `DomainEventPublisher`, STOMP `/topic/alerts`). Alert
+generation runs on `AFTER_COMMIT` + `REQUIRES_NEW` (ADR-020). **16 integration
+tests** (Testcontainers) green. Security stays open (`permitAll`) until Phase 4
+(ADR-018). Next step: **Phase 4 — Security (JWT)**.

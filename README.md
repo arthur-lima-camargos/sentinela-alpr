@@ -42,7 +42,7 @@ consulta o histórico e dispara **alertas** quando uma placa monitorada é vista
 | 0 | Arquitetura e planejamento  | ✅ Concluído    |
 | 1 | Ambiente                    | ✅ Concluído    |
 | 2 | Scaffold                    | ✅ Concluído    |
-| 3 | Domínio                     | ⚪ Pendente     |
+| 3 | Domínio                     | ✅ Concluído    |
 | 4 | Segurança (JWT)             | ⚪ Pendente     |
 | 5 | Desempenho                  | ⚪ Pendente     |
 | 6 | Tempo real                  | ⚪ Pendente     |
@@ -87,7 +87,11 @@ exibe ao vivo, com destaque visual de urgência.
 
 ## Status atual
 
-Ambiente e **scaffold prontos**: backend Spring Boot 4 (compila, conecta no
-Postgres, migration V1 aplicada) e frontend Angular 22 (build ok), com CI no
-GitHub Actions. Próximo passo: **Fase 3 — domínio** (módulos de câmeras,
-passagens, watchlist e alertas).
+**Domínio implementado (Fase 3):** os quatro módulos de negócio — câmeras (CRUD),
+passagens (registro + consulta por **keyset** + evento de domínio), watchlist
+(CRUD, placa normalizada) e alertas (matching automático + status) — com DTOs
+`record`, Bean Validation, erros `ProblemDetail` e a infra transversal
+(`GlobalExceptionHandler`, `DomainEventPublisher`, STOMP `/topic/alerts`). A
+geração de alerta usa `AFTER_COMMIT` + `REQUIRES_NEW` (ADR-020). **16 testes de
+integração** (Testcontainers) verdes. Segurança segue liberada (`permitAll`) até
+a Fase 4 (ADR-018). Próximo passo: **Fase 4 — Segurança (JWT)**.

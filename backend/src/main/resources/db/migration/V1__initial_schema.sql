@@ -1,8 +1,3 @@
--- V1 — Initial schema for Sentinela ALPR
--- Conventions: snake_case, singular table names, timestamptz (UTC),
--- cross-module reference by id (no FK), enums as varchar + CHECK.
-
--- auth module
 create table app_user (
   id            bigint generated always as identity primary key,
   login         varchar(60)  not null,
@@ -15,7 +10,6 @@ create table app_user (
   constraint ck_app_user_role check (role in ('OPERATOR','ADMIN'))
 );
 
--- cameras module
 create table camera (
   id         bigint generated always as identity primary key,
   name       varchar(120) not null,
@@ -27,7 +21,6 @@ create table camera (
   created_at timestamptz not null default now()
 );
 
--- watchlist module
 create table watched_vehicle (
   id         bigint generated always as identity primary key,
   plate      varchar(7)  not null,
@@ -39,8 +32,6 @@ create table watched_vehicle (
   constraint ck_watched_vehicle_reason check (reason in ('ROBBERY','THEFT','WANTED','SUSPECT'))
 );
 
--- detections module (append-only, high volume)
--- Composite PK (id, detected_at) to allow future RANGE partitioning.
 create table detection (
   id          bigint generated always as identity,
   plate       varchar(7) not null,
@@ -53,7 +44,6 @@ create index ix_detection_plate_time on detection (plate, detected_at desc);
 create index ix_detection_camera     on detection (camera_id);
 create index brin_detection_time     on detection using brin (detected_at);
 
--- alerts module
 create table alert (
   id                 bigint generated always as identity primary key,
   plate              varchar(7)  not null,
