@@ -7,7 +7,7 @@ spring:
     password: sentinela
   jpa:
     hibernate:
-      ddl-auto: validate      # Flyway é a fonte da verdade do schema; Hibernate só valida
+      ddl-auto: validate
     open-in-view: false
     properties:
       hibernate:
@@ -15,6 +15,13 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+
+app:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:dev-secret-change-me-please-32bytes-minimum!!}
+      access-ttl: 15m
+      refresh-ttl: 7d
 
 management:
   endpoints:

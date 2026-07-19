@@ -43,7 +43,7 @@ queries the history, and raises **alerts** when a monitored plate is seen.
 | 1 | Environment                 | ✅ Done          |
 | 2 | Scaffold                    | ✅ Done          |
 | 3 | Domain                      | ✅ Done          |
-| 4 | Security (JWT)              | ⚪ Pending      |
+| 4 | Security (JWT)              | 🟡 In progress  |
 | 5 | Performance                 | ⚪ Pending      |
 | 6 | Real time                   | ⚪ Pending      |
 
@@ -92,6 +92,14 @@ detections (record + **keyset** query + domain event), watchlist (CRUD, normaliz
 plate) and alerts (automatic matching + status) — with `record` DTOs, Bean
 Validation, `ProblemDetail` errors and the cross-cutting infra
 (`GlobalExceptionHandler`, `DomainEventPublisher`, STOMP `/topic/alerts`). Alert
-generation runs on `AFTER_COMMIT` + `REQUIRES_NEW` (ADR-020). **16 integration
-tests** (Testcontainers) green. Security stays open (`permitAll`) until Phase 4
-(ADR-018). Next step: **Phase 4 — Security (JWT)**.
+generation runs on `AFTER_COMMIT` + `REQUIRES_NEW` (ADR-020).
+
+**Security — Phase 4a (human JWT) done:** the `auth` module with login
+(`POST /api/v1/auth/login`) and refresh (`POST /api/v1/auth/refresh`) issuing
+**HS256 JWTs** via OAuth2 Resource Server (ADR-021); short access token + stateless
+refresh (ADR-022); passwords with **BCrypt**; `OPERATOR`/`ADMIN` roles (writing
+cameras/watchlist requires ADMIN); 401/403 as `ProblemDetail`; a dev admin user
+seeded in migration `V2` (ADR-023). **27 integration tests** (Testcontainers)
+green. Detection ingestion (`POST /detections`) and the WebSocket handshake stay
+open for now. Next steps: **4b — camera API keys** and
+**4c — WebSocket security**.

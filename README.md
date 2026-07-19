@@ -43,7 +43,7 @@ consulta o histórico e dispara **alertas** quando uma placa monitorada é vista
 | 1 | Ambiente                    | ✅ Concluído    |
 | 2 | Scaffold                    | ✅ Concluído    |
 | 3 | Domínio                     | ✅ Concluído    |
-| 4 | Segurança (JWT)             | ⚪ Pendente     |
+| 4 | Segurança (JWT)             | 🟡 Em andamento |
 | 5 | Desempenho                  | ⚪ Pendente     |
 | 6 | Tempo real                  | ⚪ Pendente     |
 
@@ -92,6 +92,14 @@ passagens (registro + consulta por **keyset** + evento de domínio), watchlist
 (CRUD, placa normalizada) e alertas (matching automático + status) — com DTOs
 `record`, Bean Validation, erros `ProblemDetail` e a infra transversal
 (`GlobalExceptionHandler`, `DomainEventPublisher`, STOMP `/topic/alerts`). A
-geração de alerta usa `AFTER_COMMIT` + `REQUIRES_NEW` (ADR-020). **16 testes de
-integração** (Testcontainers) verdes. Segurança segue liberada (`permitAll`) até
-a Fase 4 (ADR-018). Próximo passo: **Fase 4 — Segurança (JWT)**.
+geração de alerta usa `AFTER_COMMIT` + `REQUIRES_NEW` (ADR-020).
+
+**Segurança — Fase 4a (JWT humano) concluída:** módulo `auth` com login
+(`POST /api/v1/auth/login`) e renovação (`POST /api/v1/auth/refresh`) emitindo
+**JWT HS256** via OAuth2 Resource Server (ADR-021); access token curto + refresh
+stateless (ADR-022); senha com **BCrypt**; perfis `OPERATOR`/`ADMIN` (escrita de
+câmeras/watchlist exige ADMIN); 401/403 em `ProblemDetail`; usuário admin de dev
+semeado na migration `V2` (ADR-023). **27 testes de integração** (Testcontainers)
+verdes. Ingestão de detecções (`POST /detections`) e o handshake WebSocket seguem
+liberados provisoriamente. Próximos passos: **4b — API Key das câmeras** e
+**4c — segurança no WebSocket**.
