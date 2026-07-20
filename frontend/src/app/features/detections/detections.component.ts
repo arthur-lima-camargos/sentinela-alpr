@@ -55,7 +55,6 @@ export class DetectionsComponent implements OnInit {
     return this.cameraNames().get(id) ?? `Câmera #${id}`;
   }
 
-  /** Aplica os filtros do zero: descarta a lista e busca a primeira leva. */
   protected search(): void {
     this.loading.set(true);
     this.error.set(null);
@@ -72,7 +71,6 @@ export class DetectionsComponent implements OnInit {
     });
   }
 
-  /** Anexa a próxima leva (keyset forward-only), mantendo os filtros. */
   protected loadMore(): void {
     const cursor = this.nextCursor();
     if (cursor === null || this.loadingMore()) {
@@ -110,7 +108,6 @@ export class DetectionsComponent implements OnInit {
     };
   }
 
-  /** `datetime-local` (hora local, sem fuso) → Instant ISO-8601 em UTC. */
   private toInstant(local: string | null | undefined): string | null {
     if (!local) {
       return null;
@@ -122,7 +119,6 @@ export class DetectionsComponent implements OnInit {
   private loadCameras(): void {
     this.cameraService.list(0, 1000).subscribe({
       next: (page) => this.cameras.set(page.content),
-      // Sem câmeras carregadas a tela ainda funciona (mostra "Câmera #id").
       error: () => this.cameras.set([]),
     });
   }

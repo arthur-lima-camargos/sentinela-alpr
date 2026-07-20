@@ -1,4 +1,3 @@
-/** Estados do alerta — espelha o enum `AlertStatus` do backend. */
 export type AlertStatus = 'NEW' | 'SEEN';
 
 export interface Alert {

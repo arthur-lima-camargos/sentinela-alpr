@@ -1,1 +1,36 @@
 @use '../../shared/styles/data-screen';
+
+.dialog--wide {
+  max-width: 640px;
+}
+
+.secret {
+  margin-bottom: var(--esp-4);
+  padding: var(--esp-3) var(--esp-4);
+  border: 1px solid var(--cor-atencao);
+  border-radius: var(--raio);
+  background: color-mix(in srgb, var(--cor-atencao) 12%, transparent);
+}
+
+.secret__warn {
+  margin: 0 0 var(--esp-2);
+  font-size: 0.85rem;
+  color: var(--cor-texto);
+}
+
+.secret__row {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+}
+
+.secret__value {
+  flex: 1;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding: var(--esp-2) var(--esp-3);
+  background: var(--cor-fundo);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  font-size: 0.85rem;
+}

@@ -5,7 +5,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 
 import { AuthService } from '../../core/auth/auth.service';
 import { CameraService } from '../../core/cameras/camera.service';
+import { CameraApiKeyService } from '../../core/cameras/camera-api-key.service';
 import { Camera, CameraRequest } from '../../shared/models/camera.model';
+import { ApiKey } from '../../shared/models/camera-api-key.model';
 
 @Component({
   selector: 'app-cameras',
@@ -15,6 +17,7 @@ import { Camera, CameraRequest } from '../../shared/models/camera.model';
 })
 export class CamerasComponent implements OnInit {
   private readonly service = inject(CameraService);
+  private readonly apiKeys = inject(CameraApiKeyService);
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
 
@@ -31,6 +34,14 @@ export class CamerasComponent implements OnInit {
   protected readonly formError = signal<string | null>(null);
 
   protected readonly isAdmin = computed(() => this.auth.currentUser()?.role === 'ADMIN');
+
+  protected readonly keysCamera = signal<Camera | null>(null);
+  protected readonly keys = signal<ApiKey[]>([]);
+  protected readonly keysLoading = signal(false);
+  protected readonly keysError = signal<string | null>(null);
+  protected readonly issuing = signal(false);
+  protected readonly issuedSecret = signal<string | null>(null);
+  protected readonly copied = signal(false);
 
   protected readonly form = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(120)]],
@@ -134,6 +145,76 @@ export class CamerasComponent implements OnInit {
     if (this.page() + 1 < this.totalPages()) {
       this.load(this.page() + 1);
     }
+  }
+
+  protected openKeys(camera: Camera): void {
+    this.keysCamera.set(camera);
+    this.issuedSecret.set(null);
+    this.copied.set(false);
+    this.keysError.set(null);
+    this.loadKeys(camera.id);
+  }
+
+  protected closeKeys(): void {
+    this.keysCamera.set(null);
+    this.keys.set([]);
+    this.issuedSecret.set(null);
+  }
+
+  protected issueKey(): void {
+    const camera = this.keysCamera();
+    if (camera === null) {
+      return;
+    }
+    this.issuing.set(true);
+    this.keysError.set(null);
+    this.copied.set(false);
+    this.apiKeys.issue(camera.id).subscribe({
+      next: (issued) => {
+        this.issuedSecret.set(issued.apiKey);
+        this.issuing.set(false);
+        this.loadKeys(camera.id);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.issuing.set(false);
+        this.keysError.set(this.message(err));
+      },
+    });
+  }
+
+  protected revokeKey(key: ApiKey): void {
+    const camera = this.keysCamera();
+    if (camera === null || !confirm(`Revogar a chave ${key.keyPrefix}…? A câmera deixará de autenticar com ela.`)) {
+      return;
+    }
+    this.apiKeys.revoke(camera.id, key.id).subscribe({
+      next: () => this.loadKeys(camera.id),
+      error: (err: HttpErrorResponse) => this.keysError.set(this.message(err)),
+    });
+  }
+
+  protected copySecret(): void {
+    const secret = this.issuedSecret();
+    if (secret && navigator.clipboard) {
+      navigator.clipboard.writeText(secret).then(
+        () => this.copied.set(true),
+        () => this.copied.set(false),
+      );
+    }
+  }
+
+  private loadKeys(cameraId: number): void {
+    this.keysLoading.set(true);
+    this.apiKeys.list(cameraId).subscribe({
+      next: (list) => {
+        this.keys.set(list);
+        this.keysLoading.set(false);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.keysError.set(this.message(err));
+        this.keysLoading.set(false);
+      },
+    });
   }
 
   private toRequest(): CameraRequest {

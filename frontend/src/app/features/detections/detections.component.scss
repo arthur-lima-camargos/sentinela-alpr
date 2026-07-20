@@ -1,6 +1,5 @@
 @use '../../shared/styles/data-screen';
 
-/* --- barra de filtros --- */
 .filters {
   display: flex;
   flex-wrap: wrap;
@@ -24,7 +23,6 @@
   flex: 0 0 auto;
 }
 
-/* --- carregar mais --- */
 .loadmore {
   display: flex;
   align-items: center;

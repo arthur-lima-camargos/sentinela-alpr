@@ -124,17 +124,17 @@ describe('AlertsComponent', () => {
 
   it('não duplica um alerta ao vivo já presente na lista', () => {
     const fixture = create();
-    messages$.next(AL); // mesmo id do que já veio do servidor
+    messages$.next(AL);
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelectorAll('tbody tr').length).toBe(1);
   });
 
   it('ignora alerta ao vivo que não casa com o filtro atual', () => {
     const fixture = create();
-    buttonByText(fixture.nativeElement, 'Vistos')!.click(); // filtro SEEN
+    buttonByText(fixture.nativeElement, 'Vistos')!.click();
     fixture.detectChanges();
 
-    messages$.next({ ...AL, id: 12, status: 'NEW' }); // NEW não casa com SEEN
+    messages$.next({ ...AL, id: 12, status: 'NEW' });
     fixture.detectChanges();
 
     const rows = [...fixture.nativeElement.querySelectorAll('tbody tr')];

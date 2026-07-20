@@ -4,8 +4,10 @@ import { of, throwError } from 'rxjs';
 
 import { CamerasComponent } from './cameras.component';
 import { CameraService } from '../../core/cameras/camera.service';
+import { CameraApiKeyService } from '../../core/cameras/camera-api-key.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { Camera } from '../../shared/models/camera.model';
+import { ApiKey } from '../../shared/models/camera-api-key.model';
 import { CurrentUser } from '../../core/auth/auth.models';
 
 function pageOf(content: Camera[]) {
@@ -30,6 +32,15 @@ const CAM: Camera = {
   createdAt: '2026-01-01T00:00:00Z',
 };
 
+const KEY: ApiKey = {
+  id: 7,
+  cameraId: 1,
+  keyPrefix: 'alpr_ab12',
+  active: true,
+  createdAt: '2026-01-01T00:00:00Z',
+  revokedAt: null,
+};
+
 describe('CamerasComponent', () => {
   let currentUser: ReturnType<typeof signal<CurrentUser | null>>;
   let serviceStub: {
@@ -38,6 +49,11 @@ describe('CamerasComponent', () => {
     update: ReturnType<typeof vi.fn>;
     deactivate: ReturnType<typeof vi.fn>;
     activate: ReturnType<typeof vi.fn>;
+  };
+  let apiKeyStub: {
+    list: ReturnType<typeof vi.fn>;
+    issue: ReturnType<typeof vi.fn>;
+    revoke: ReturnType<typeof vi.fn>;
   };
 
   function buttonByText(el: HTMLElement, text: string): HTMLButtonElement | undefined {
@@ -59,11 +75,17 @@ describe('CamerasComponent', () => {
       deactivate: vi.fn(() => of(void 0)),
       activate: vi.fn(() => of(void 0)),
     };
+    apiKeyStub = {
+      list: vi.fn(() => of([KEY])),
+      issue: vi.fn(() => of({ id: 8, cameraId: 1, apiKey: 'alpr_fullsecret', keyPrefix: 'alpr_cd34', createdAt: '2026-01-01T00:00:00Z' })),
+      revoke: vi.fn(() => of(void 0)),
+    };
 
     await TestBed.configureTestingModule({
       imports: [CamerasComponent],
       providers: [
         { provide: CameraService, useValue: serviceStub },
+        { provide: CameraApiKeyService, useValue: apiKeyStub },
         { provide: AuthService, useValue: { currentUser } },
       ],
     }).compileComponents();
@@ -159,5 +181,43 @@ describe('CamerasComponent', () => {
     const el = create().nativeElement;
 
     expect(el.textContent).toContain('Falha ao carregar');
+  });
+
+  it('abre o modal de chaves e lista as chaves da câmera', () => {
+    const fixture = create();
+    const el: HTMLElement = fixture.nativeElement;
+
+    buttonByText(el, 'Chaves')!.click();
+    fixture.detectChanges();
+
+    expect(apiKeyStub.list).toHaveBeenCalledWith(1);
+    expect(el.textContent).toContain('Chaves de API — Portal Norte');
+    expect(el.textContent).toContain('alpr_ab12');
+  });
+
+  it('emite uma nova chave e mostra o segredo uma única vez', () => {
+    const fixture = create();
+    const el: HTMLElement = fixture.nativeElement;
+
+    buttonByText(el, 'Chaves')!.click();
+    fixture.detectChanges();
+    buttonByText(el, 'Emitir nova chave')!.click();
+    fixture.detectChanges();
+
+    expect(apiKeyStub.issue).toHaveBeenCalledWith(1);
+    expect(el.textContent).toContain('alpr_fullsecret');
+    expect(el.textContent).toContain('não será exibida novamente');
+  });
+
+  it('revoga uma chave após confirmação', () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const fixture = create();
+    const el: HTMLElement = fixture.nativeElement;
+
+    buttonByText(el, 'Chaves')!.click();
+    fixture.detectChanges();
+    buttonByText(el, 'Revogar')!.click();
+
+    expect(apiKeyStub.revoke).toHaveBeenCalledWith(1, 7);
   });
 });

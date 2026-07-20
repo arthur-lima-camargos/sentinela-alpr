@@ -36,7 +36,6 @@ export class AlertsComponent implements OnInit {
   protected readonly connected = this.realtime.connected;
 
   ngOnInit(): void {
-    // O operador está olhando os alertas agora: zera o badge do topbar.
     this.realtime.resetLiveCount();
     this.loadReasons();
     this.load(0);
@@ -106,7 +105,6 @@ export class AlertsComponent implements OnInit {
     });
   }
 
-  /** Alerta chegado pelo STOMP: insere no topo se combina com o filtro atual. */
   private onLive(alert: Alert): void {
     const filter = this.statusFilter();
     if (filter !== null && alert.status !== filter) {

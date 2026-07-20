@@ -53,6 +53,7 @@
               @if (isAdmin()) {
                 <td class="table__actions">
                   <button class="btn btn--sm" type="button" (click)="openEdit(c)">Editar</button>
+                  <button class="btn btn--sm" type="button" (click)="openKeys(c)">Chaves</button>
                   @if (c.active) {
                     <button class="btn btn--sm btn--danger" type="button" (click)="deactivate(c)">Desativar</button>
                   } @else {
@@ -121,6 +122,74 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+}
+
+@if (keysCamera(); as cam) {
+  <div class="overlay" (click)="closeKeys()">
+    <div class="dialog dialog--wide" role="dialog" aria-modal="true" aria-labelledby="keys-title" (click)="$event.stopPropagation()">
+      <h2 id="keys-title">Chaves de API — {{ cam.name }}</h2>
+
+      @if (issuedSecret(); as secret) {
+        <div class="secret" role="alert">
+          <p class="secret__warn"><strong>Copie agora.</strong> Esta chave não será exibida novamente.</p>
+          <div class="secret__row">
+            <code class="secret__value mono">{{ secret }}</code>
+            <button class="btn btn--sm" type="button" (click)="copySecret()">
+              {{ copied() ? 'Copiado!' : 'Copiar' }}
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (keysError()) {
+        <div class="state state--error" role="alert">{{ keysError() }}</div>
+      }
+
+      @if (keysLoading()) {
+        <div class="state" role="status">Carregando…</div>
+      } @else if (keys().length === 0) {
+        <div class="state">Nenhuma chave emitida para esta câmera.</div>
+      } @else {
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Prefixo</th>
+                <th>Status</th>
+                <th>Criada em</th>
+                <th class="table__actions">Ação</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (k of keys(); track k.id) {
+                <tr [class.row--inactive]="!k.active">
+                  <td class="mono">{{ k.keyPrefix }}…</td>
+                  <td>
+                    <span class="badge" [class.badge--ok]="k.active" [class.badge--off]="!k.active">
+                      {{ k.active ? 'Ativa' : 'Revogada' }}
+                    </span>
+                  </td>
+                  <td>{{ k.createdAt | date: 'short' }}</td>
+                  <td class="table__actions">
+                    @if (k.active) {
+                      <button class="btn btn--sm btn--danger" type="button" (click)="revokeKey(k)">Revogar</button>
+                    } @else { — }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <div class="form__actions">
+        <button class="btn" type="button" (click)="closeKeys()">Fechar</button>
+        <button class="btn btn--primary" type="button" (click)="issueKey()" [disabled]="issuing()">
+          {{ issuing() ? 'Emitindo…' : 'Emitir nova chave' }}
+        </button>
+      </div>
     </div>
   </div>
 }

@@ -7,11 +7,6 @@ import { Alert } from '../../shared/models/alert.model';
 
 const TOPIC = '/topic/alerts';
 
-/**
- * Cliente STOMP dos alertas em tempo real. Conecta ao `/ws`, autentica no frame
- * CONNECT com o access token (puxado a cada tentativa, para sobreviver a refresh)
- * e assina `/topic/alerts`. Vive no shell autenticado.
- */
 @Injectable({ providedIn: 'root' })
 export class AlertRealtimeService {
   private readonly auth = inject(AuthService);
@@ -19,13 +14,10 @@ export class AlertRealtimeService {
   private client?: Client;
   private readonly incoming = new Subject<Alert>();
 
-  /** Cada alerta recebido pelo tópico. */
   readonly messages$ = this.incoming.asObservable();
 
-  /** Conexão STOMP ativa. */
   readonly connected = signal(false);
 
-  /** Alertas NEW chegados ao vivo desde o último reset (badge do topbar). */
   readonly liveCount = signal(0);
 
   connect(): void {
@@ -49,7 +41,7 @@ export class AlertRealtimeService {
               this.liveCount.update((n) => n + 1);
             }
           } catch {
-            // payload malformado: ignora sem derrubar a conexão
+            return;
           }
         });
       },
@@ -67,7 +59,6 @@ export class AlertRealtimeService {
     this.client = undefined;
   }
 
-  /** Zera o contador do badge (ex.: ao abrir a tela de alertas). */
   resetLiveCount(): void {
     this.liveCount.set(0);
   }

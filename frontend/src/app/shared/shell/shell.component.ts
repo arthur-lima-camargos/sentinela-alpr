@@ -18,7 +18,6 @@ export class ShellComponent implements OnInit, OnDestroy {
   protected readonly liveCount = this.realtime.liveCount;
 
   ngOnInit(): void {
-    // O shell só renderiza autenticado (guard): abre o canal de tempo real.
     this.realtime.connect();
   }
 
