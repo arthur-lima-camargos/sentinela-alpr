@@ -44,7 +44,7 @@ queries the history, and raises **alerts** when a monitored plate is seen.
 | 2 | Scaffold                    | ✅ Done          |
 | 3 | Domain                      | ✅ Done          |
 | 4 | Security (JWT)              | ✅ Done          |
-| 5 | Performance                 | ⚪ Pending      |
+| 5 | Performance                 | 🟡 In progress  |
 | 6 | Real time                   | ⚪ Pending      |
 
 **Legend:** ✅ done · 🟡 in progress · ⚪ pending
@@ -127,5 +127,21 @@ with the logged-in user and logout. Design tokens (dark theme) in `styles.scss`;
 Angular CLI proxy (`/api → :8080`) for dev cross-origin. Flow validated end to end
 through the proxy (login/refresh/401/403).
 
-With Phase 4 complete, the **next step is Phase 5 — Performance** (high-volume seed,
-indexes, concurrency and load testing with k6).
+**Frontend — camera management (done):** the first data screen. An authenticated
+navigation shell (topbar + Panel/Cameras menu), a **cameras** table with pagination,
+create/edit in a **modal** (Reactive Forms + validation mirroring the backend) and
+actions restricted to **ADMIN** (OPERATOR sees read-only). On the backend, camera
+**reactivation** was added (`POST /api/v1/cameras/{id}/activate`), making the
+soft-delete reversible (ADR-026). Test coverage expanded: **43** backend integration
+tests and **16** on the frontend (Vitest), including role authorization (403/401).
+
+**Performance — Phase 5 (in progress):** an **A/B benchmark with vs without
+indexes** over 10M detections, measuring reads, writes and disk in a fixed-resource
+Docker environment (ADR-027). Results: plate lookup ~11,000× faster; camera+time
+range with a **composite** index `(camera_id, detected_at)` ~83×; BRIN (40 kB) ~60×
+on a recent window; writes ~2.75× slower and ~602 MB of indexes. The harness
+(not versioned) lives in `bench/`. **Pending:** concurrency tests, k6 load testing
+and the camera simulator.
+
+Next steps: finish Phase 5 (concurrency, k6, simulator) and build the detections,
+watchlist and real-time alerts dashboard screens (Phase 6).

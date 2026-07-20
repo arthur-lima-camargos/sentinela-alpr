@@ -52,6 +52,11 @@ public class CameraService {
 		require(id).setActive(false);
 	}
 
+	@Transactional
+	public void activate(Long id) {
+		require(id).setActive(true);
+	}
+
 	private Camera require(Long id) {
 		return repository.findById(id)
 				.orElseThrow(() -> new NotFoundException("Camera not found: " + id));

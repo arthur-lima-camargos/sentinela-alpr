@@ -57,4 +57,10 @@ class CameraController {
 		service.deactivate(id);
 		return ResponseEntity.noContent().build();
 	}
+
+	@PostMapping("/{id}/activate")
+	ResponseEntity<Void> activate(@PathVariable Long id) {
+		service.activate(id);
+		return ResponseEntity.noContent().build();
+	}
 }

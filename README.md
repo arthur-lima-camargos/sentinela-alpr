@@ -44,7 +44,7 @@ consulta o histórico e dispara **alertas** quando uma placa monitorada é vista
 | 2 | Scaffold                    | ✅ Concluído    |
 | 3 | Domínio                     | ✅ Concluído    |
 | 4 | Segurança (JWT)             | ✅ Concluído    |
-| 5 | Desempenho                  | ⚪ Pendente     |
+| 5 | Desempenho                  | 🟡 Em andamento |
 | 6 | Tempo real                  | ⚪ Pendente     |
 
 **Legenda:** ✅ concluído · 🟡 em andamento · ⚪ pendente
@@ -127,5 +127,22 @@ com usuário logado e logout. Tokens de design (tema escuro) em `styles.scss`;
 proxy do Angular CLI (`/api → :8080`) para o dev cross-origin. Fluxo validado ponta
 a ponta pelo proxy (login/refresh/401/403).
 
-Com a Fase 4 concluída, o **próximo passo é a Fase 5 — Desempenho** (seed de alto
-volume, índices, concorrência e carga com k6).
+**Frontend — gestão de câmeras (concluído):** primeira tela de dados. Shell de
+navegação autenticado (topbar + menu Painel/Câmeras), tela de **câmeras** em tabela
+com paginação, criação/edição em **modal** (Reactive Forms + validação espelhando o
+backend) e ações restritas a **ADMIN** (OPERATOR vê somente leitura). No backend,
+adicionada a **reativação** de câmera (`POST /api/v1/cameras/{id}/activate`),
+tornando o soft-delete reversível (ADR-026). Cobertura de testes ampliada: **43**
+testes de integração no backend e **16** no frontend (Vitest), incluindo autorização
+por perfil (403/401).
+
+**Desempenho — Fase 5 (em andamento):** conduzido um **benchmark comparativo
+com/sem índice** sobre 10M passagens, medindo leitura, escrita e disco em ambiente
+Docker de recursos fixos (ADR-027). Resultados: busca por placa ~11.000× mais rápida;
+câmera+período com índice **composto** `(camera_id, detected_at)` ~83×; BRIN (40 kB)
+~60× em janela recente; escrita ~2,75× mais lenta e ~602 MB de índices. O harness
+(não versionado) fica em `bench/`. **Pendentes:** testes de concorrência, carga com
+k6 e simulador de câmeras.
+
+Próximos passos: concluir a Fase 5 (concorrência, k6, simulador) e construir as
+telas de passagens, watchlist e o dashboard de alertas em tempo real (Fase 6).
