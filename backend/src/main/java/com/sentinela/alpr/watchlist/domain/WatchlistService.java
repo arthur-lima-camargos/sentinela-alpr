@@ -13,6 +13,7 @@ import com.sentinela.alpr.shared.error.NotFoundException;
 import com.sentinela.alpr.shared.support.PlateNormalizer;
 import com.sentinela.alpr.watchlist.api.WatchlistRequest;
 import com.sentinela.alpr.watchlist.api.WatchlistResponse;
+import com.sentinela.alpr.watchlist.api.WatchlistUpdateRequest;
 import com.sentinela.alpr.watchlist.infra.WatchedVehicleRepository;
 
 @Service
@@ -46,17 +47,31 @@ public class WatchlistService {
 	}
 
 	@Transactional
-	public void remove(Long id) {
-		if (!repository.existsById(id)) {
-			throw new NotFoundException("Watchlist item not found: " + id);
-		}
-		repository.deleteById(id);
+	public WatchlistResponse update(Long id, WatchlistUpdateRequest request) {
+		WatchedVehicle vehicle = require(id);
+		vehicle.setReason(request.reason());
+		return toResponse(vehicle);
+	}
+
+	@Transactional
+	public void deactivate(Long id) {
+		require(id).setActive(false);
+	}
+
+	@Transactional
+	public void activate(Long id) {
+		require(id).setActive(true);
 	}
 
 	@Transactional(readOnly = true)
 	public Optional<WatchlistResponse> findActiveMatch(String plate) {
 		return repository.findByPlateAndActiveTrue(PlateNormalizer.normalize(plate))
 				.map(WatchlistService::toResponse);
+	}
+
+	private WatchedVehicle require(Long id) {
+		return repository.findById(id)
+				.orElseThrow(() -> new NotFoundException("Watchlist item not found: " + id));
 	}
 
 	private static String normalizePlate(String raw) {

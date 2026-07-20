@@ -42,12 +42,12 @@ consulta o histórico e dispara **alertas** quando uma placa monitorada é vista
 | 0 | Arquitetura e planejamento  | ✅ Concluído    |
 | 1 | Ambiente                    | ✅ Concluído    |
 | 2 | Scaffold                    | ✅ Concluído    |
-| 3 | Domínio                     | ✅ Concluído    |
+| 3 | Domínio (API REST)          | ✅ Concluído    |
 | 4 | Segurança (JWT)             | ✅ Concluído    |
-| 5 | Desempenho                  | 🟡 Em andamento |
-| 6 | Tempo real                  | ⚪ Pendente     |
+| 5 | Desempenho (benchmark)      | 🟡 Parcial      |
+| 6 | Frontend — telas de consumo | 🟡 Em andamento |
 
-**Legenda:** ✅ concluído · 🟡 em andamento · ⚪ pendente
+**Legenda:** ✅ concluído · 🟡 em andamento/parcial · ⚪ pendente
 
 ## Detalhamento das fases
 
@@ -66,24 +66,29 @@ inicial do schema. Validar que backend sobe, conecta no banco e o frontend serve
 Inclui a configuração da **Integração Contínua** (GitHub Actions), validando build
 e testes a cada push.
 
-**Fase 3 — Domínio**
+**Fase 3 — Domínio (API REST)**
 Regra de negócio dos módulos: câmeras (CRUD), passagens (registro + consulta por
 keyset + evento), watchlist (CRUD) e alertas (matching + status). Com DTOs,
-validação, tratamento de erro (`ProblemDetail`) e testes.
+validação, tratamento de erro (`ProblemDetail`) e testes. Resultou na **API REST
+completa do MVP**, que a Fase 6 passa a consumir.
 
 **Fase 4 — Segurança (JWT)**
 Backend: usuário, autenticação stateless, login com emissão de JWT, perfis e senha
 com BCrypt. Frontend: tela de login, interceptor de token, guards de rota e
 tratamento de sessão expirada.
 
-**Fase 5 — Desempenho**
-Cenário base determinístico e seed de 5–10M passagens; validação de índices com
-`EXPLAIN ANALYZE`; testes de concorrência; carga com k6 (latência e throughput);
-simulador de câmeras.
+**Fase 5 — Desempenho (benchmark)**
+Benchmark comparativo **com/sem índice** sobre 10M passagens (leitura, escrita e
+disco) em ambiente Docker de recursos fixos — material para publicação técnica.
+**Concluído para esse escopo (só banco).** Ficam **adiados** (fora do caminho
+crítico do MVP): carga com k6, simulador de câmeras e testes de concorrência.
 
-**Fase 6 — Tempo real**
-WebSocket/STOMP: o backend publica alertas em `/topic/alerts` e o dashboard os
-exibe ao vivo, com destaque visual de urgência.
+**Fase 6 — Frontend: telas de consumo da API**
+Construir as telas que consomem os recursos da API: **câmeras** e **watchlist**
+(prontas), **passagens** (consulta por keyset com filtros), **alertas** (triagem por
+status) e o **painel em tempo real** (cliente WebSocket/STOMP assinando
+`/topic/alerts`, com destaque visual de urgência). O tempo real é a entrega final
+desta fase.
 
 ## Status atual
 
@@ -132,17 +137,52 @@ navegação autenticado (topbar + menu Painel/Câmeras), tela de **câmeras** em
 com paginação, criação/edição em **modal** (Reactive Forms + validação espelhando o
 backend) e ações restritas a **ADMIN** (OPERATOR vê somente leitura). No backend,
 adicionada a **reativação** de câmera (`POST /api/v1/cameras/{id}/activate`),
-tornando o soft-delete reversível (ADR-026). Cobertura de testes ampliada: **43**
-testes de integração no backend e **16** no frontend (Vitest), incluindo autorização
-por perfil (403/401).
+tornando o soft-delete reversível (ADR-026).
 
-**Desempenho — Fase 5 (em andamento):** conduzido um **benchmark comparativo
-com/sem índice** sobre 10M passagens, medindo leitura, escrita e disco em ambiente
-Docker de recursos fixos (ADR-027). Resultados: busca por placa ~11.000× mais rápida;
-câmera+período com índice **composto** `(camera_id, detected_at)` ~83×; BRIN (40 kB)
-~60× em janela recente; escrita ~2,75× mais lenta e ~602 MB de índices. O harness
-(não versionado) fica em `bench/`. **Pendentes:** testes de concorrência, carga com
-k6 e simulador de câmeras.
+**Frontend — gestão da watchlist (concluído):** segunda tela de dados, no mesmo
+padrão de câmeras (tabela paginada + modal). Para alinhá-la, o backend da watchlist
+ganhou **soft-delete reversível** (`DELETE` passou a marcar `active=false`),
+**reativação** (`POST /api/v1/watchlist/{id}/activate`) e **reclassificação de
+motivo** (`PUT /api/v1/watchlist/{id}`, só o `reason` — a placa é imutável), tudo
+restrito a ADMIN (ADR-028). A tela valida a placa no cliente (mesmo formato
+Mercosul/antigo do backend), exibe o motivo (Roubo/Furto/Procurado/Suspeito) e o
+status, com placas em fonte monoespaçada. Estilos comuns das telas de dados
+extraídos para um parcial SCSS compartilhado. Cobertura ampliada: **53** testes de
+integração no backend e **32** no frontend (Vitest), incluindo autorização por
+perfil (403/401).
 
-Próximos passos: concluir a Fase 5 (concorrência, k6, simulador) e construir as
-telas de passagens, watchlist e o dashboard de alertas em tempo real (Fase 6).
+**Desempenho — Fase 5 (benchmark concluído; carga adiada):** conduzido um
+**benchmark comparativo com/sem índice** sobre 10M passagens, medindo leitura,
+escrita e disco em ambiente Docker de recursos fixos (ADR-027). Resultados: busca por
+placa ~11.000× mais rápida; câmera+período com índice **composto**
+`(camera_id, detected_at)` ~83×; BRIN (40 kB) ~60× em janela recente; escrita ~2,75×
+mais lenta e ~602 MB de índices. O harness (não versionado) fica em `bench/`.
+**Adiados** (fora do caminho crítico do MVP): testes de concorrência, carga com k6 e
+simulador de câmeras.
+
+## Momento atual
+
+O backend expõe a **API REST completa do MVP** (auth, câmeras + API keys, passagens,
+watchlist, alertas) e o **broadcast de alertas em tempo real** (STOMP
+`/topic/alerts`), tudo coberto por **53 testes de integração**. O foco agora é o
+**frontend consumindo esses recursos** — login, câmeras e watchlist já prontos.
+
+**Cobertura da API pelo frontend:**
+
+| Recurso                                       | Backend | Tela |
+|-----------------------------------------------|:-------:|:----:|
+| Autenticação (login / refresh)                |   ✅    |  ✅  |
+| Câmeras (CRUD)                                 |   ✅    |  ✅  |
+| API keys por câmera (emitir / listar / revogar) | ✅    |  ⚪  |
+| Passagens (consulta por keyset + filtros)      |   ✅    |  ⚪  |
+| Watchlist (CRUD + reclassificação)             |   ✅    |  ✅  |
+| Alertas (listar / filtrar + mudar status)      |   ✅    |  ⚪  |
+| Alertas em tempo real (`/topic/alerts`)        |   ✅    |  ⚪  |
+
+> A ingestão de passagens (`POST /api/v1/detections`) é consumida pela **câmera**
+> (via API key), não pela UI — por isso não tem tela.
+
+**Próximas telas:** passagens (histórico com filtros e paginação por **cursor**),
+alertas (triagem) + **cliente WebSocket/STOMP** para alertas ao vivo, gestão de
+**API keys** dentro da tela de câmeras, e um **painel** (`home`) real com métricas —
+hoje a home é apenas um placeholder.

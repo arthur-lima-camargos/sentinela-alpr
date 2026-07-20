@@ -1,0 +1,123 @@
+<section class="page">
+  <header class="page__head">
+    <div>
+      <h1>Veículos monitorados</h1>
+      <p class="page__sub">{{ totalElements() }} placa(s) na watchlist</p>
+    </div>
+    @if (isAdmin()) {
+      <button class="btn btn--primary" type="button" (click)="openCreate()">Nova placa</button>
+    }
+  </header>
+
+  @if (loading()) {
+    <div class="state" role="status">Carregando…</div>
+  } @else if (error()) {
+    <div class="state state--error" role="alert">
+      {{ error() }}
+      <button class="btn" type="button" (click)="load(page())">Tentar de novo</button>
+    </div>
+  } @else if (items().length === 0) {
+    <div class="state">
+      Nenhuma placa monitorada.
+      @if (isAdmin()) { Clique em <strong>Nova placa</strong> para começar. }
+    </div>
+  } @else {
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Placa</th>
+            <th>Motivo</th>
+            <th>Status</th>
+            <th>Criada em</th>
+            @if (isAdmin()) { <th class="table__actions">Ações</th> }
+          </tr>
+        </thead>
+        <tbody>
+          @for (w of items(); track w.id) {
+            <tr [class.row--inactive]="!w.active">
+              <td class="mono">{{ w.plate }}</td>
+              <td>
+                <span class="badge badge--reason">{{ reasonLabel(w.reason) }}</span>
+              </td>
+              <td>
+                <span class="badge" [class.badge--ok]="w.active" [class.badge--off]="!w.active">
+                  {{ w.active ? 'Ativo' : 'Inativo' }}
+                </span>
+              </td>
+              <td>{{ w.createdAt | date: 'short' }}</td>
+              @if (isAdmin()) {
+                <td class="table__actions">
+                  <button class="btn btn--sm" type="button" (click)="openEdit(w)">Editar</button>
+                  @if (w.active) {
+                    <button class="btn btn--sm btn--danger" type="button" (click)="deactivate(w)">Desativar</button>
+                  } @else {
+                    <button class="btn btn--sm" type="button" (click)="activate(w)">Reativar</button>
+                  }
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <footer class="pager">
+      <button class="btn btn--sm" type="button" [disabled]="page() === 0" (click)="prev()">Anterior</button>
+      <span class="pager__info">Página {{ page() + 1 }} de {{ totalPages() }}</span>
+      <button class="btn btn--sm" type="button" [disabled]="page() + 1 >= totalPages()" (click)="next()">Próxima</button>
+    </footer>
+  }
+</section>
+
+@if (formOpen()) {
+  <div class="overlay" (click)="closeForm()">
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-title" (click)="$event.stopPropagation()">
+      <h2 id="dlg-title">{{ editingId() === null ? 'Nova placa monitorada' : 'Reclassificar motivo' }}</h2>
+
+      <form [formGroup]="form" (ngSubmit)="save()" class="form">
+        <label class="field">
+          <span class="field__label">Placa *</span>
+          <input class="field__input mono" type="text" formControlName="plate" maxlength="8"
+                 autocomplete="off" autocapitalize="characters" spellcheck="false" />
+          @if (editingId() !== null) {
+            <span class="field__hint">A placa não pode ser alterada. Edite apenas o motivo.</span>
+          } @else if (form.controls.plate.touched && form.controls.plate.invalid) {
+            <span class="field__error">Informe uma placa válida (ex.: ABC1D34 ou ABC1234).</span>
+          }
+        </label>
+
+        <label class="field">
+          <span class="field__label">Motivo *</span>
+          <select class="field__input" formControlName="reason">
+            <option [ngValue]="null" disabled>Selecione…</option>
+            @for (r of reasons; track r.value) {
+              <option [ngValue]="r.value">{{ r.label }}</option>
+            }
+          </select>
+          @if (form.controls.reason.touched && form.controls.reason.invalid) {
+            <span class="field__error">Selecione um motivo.</span>
+          }
+        </label>
+
+        @if (editingId() === null) {
+          <label class="field field--check">
+            <input type="checkbox" formControlName="active" />
+            <span class="field__label">Monitoramento ativo</span>
+          </label>
+        }
+
+        @if (formError()) {
+          <div class="state state--error" role="alert">{{ formError() }}</div>
+        }
+
+        <div class="form__actions">
+          <button class="btn" type="button" (click)="closeForm()">Cancelar</button>
+          <button class="btn btn--primary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Salvando…' : 'Salvar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

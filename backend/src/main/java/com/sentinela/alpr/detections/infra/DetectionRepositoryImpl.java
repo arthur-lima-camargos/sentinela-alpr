@@ -43,7 +43,6 @@ class DetectionRepositoryImpl implements DetectionRepositoryCustom {
 			where.add(cb.lessThanOrEqualTo(detectedAt, to));
 		}
 		if (cursorTs != null && cursorId != null) {
-			// (detectedAt, id) < (cursorTs, cursorId) — seek estrito para a próxima página.
 			where.add(cb.or(
 					cb.lessThan(detectedAt, cursorTs),
 					cb.and(cb.equal(detectedAt, cursorTs), cb.lessThan(id, cursorId))));

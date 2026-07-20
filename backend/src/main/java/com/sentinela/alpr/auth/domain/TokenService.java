@@ -11,10 +11,6 @@ import org.springframework.stereotype.Service;
 
 import com.sentinela.alpr.auth.api.TokenResponse;
 
-/**
- * Emite os tokens JWT (HS256). O {@code sub} é o login; a claim {@code role}
- * carrega o perfil e {@code type} distingue access de refresh.
- */
 @Service
 public class TokenService {
 

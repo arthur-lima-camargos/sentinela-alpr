@@ -24,6 +24,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/cameras/cameras.component').then((m) => m.CamerasComponent),
       },
+      {
+        path: 'watchlist',
+        loadComponent: () =>
+          import('./features/watchlist/watchlist.component').then((m) => m.WatchlistComponent),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

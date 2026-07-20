@@ -42,12 +42,12 @@ queries the history, and raises **alerts** when a monitored plate is seen.
 | 0 | Architecture & planning     | ✅ Done          |
 | 1 | Environment                 | ✅ Done          |
 | 2 | Scaffold                    | ✅ Done          |
-| 3 | Domain                      | ✅ Done          |
+| 3 | Domain (REST API)           | ✅ Done          |
 | 4 | Security (JWT)              | ✅ Done          |
-| 5 | Performance                 | 🟡 In progress  |
-| 6 | Real time                   | ⚪ Pending      |
+| 5 | Performance (benchmark)     | 🟡 Partial      |
+| 6 | Frontend — API screens      | 🟡 In progress  |
 
-**Legend:** ✅ done · 🟡 in progress · ⚪ pending
+**Legend:** ✅ done · 🟡 in progress/partial · ⚪ pending
 
 ## Phase details
 
@@ -66,24 +66,28 @@ schema migration. Verify the backend boots, connects to the database and the
 frontend serves. Includes **Continuous Integration** setup (GitHub Actions),
 validating build and tests on every push.
 
-**Phase 3 — Domain**
+**Phase 3 — Domain (REST API)**
 Business logic of the modules: cameras (CRUD), detections (recording + keyset query
 + event), watchlist (CRUD) and alerts (matching + status). With DTOs, validation,
-error handling (`ProblemDetail`) and tests.
+error handling (`ProblemDetail`) and tests. It produced the **complete MVP REST
+API** that Phase 6 now consumes.
 
 **Phase 4 — Security (JWT)**
 Backend: user, stateless authentication, login issuing a JWT, roles and BCrypt
 password hashing. Frontend: login screen, token interceptor, route guards and
 expired-session handling.
 
-**Phase 5 — Performance**
-Deterministic base scenario and a 5–10M detection seed; index validation with
-`EXPLAIN ANALYZE`; concurrency tests; load testing with k6 (latency and
-throughput); camera simulator.
+**Phase 5 — Performance (benchmark)**
+An A/B benchmark **with vs without indexes** over 10M detections (reads, writes and
+disk) in a fixed-resource Docker environment — material for a technical write-up.
+**Done for that scope (database only).** **Deferred** (off the MVP critical path):
+k6 load testing, the camera simulator and concurrency tests.
 
-**Phase 6 — Real time**
-WebSocket/STOMP: the backend publishes alerts to `/topic/alerts` and the
-dashboard shows them live, with visual urgency highlighting.
+**Phase 6 — Frontend: API consumption screens**
+Build the screens that consume the API resources: **cameras** and **watchlist**
+(done), **detections** (keyset query with filters), **alerts** (status triage) and
+the **real-time panel** (WebSocket/STOMP client subscribing to `/topic/alerts`, with
+visual urgency highlighting). Real time is the final deliverable of this phase.
 
 ## Current status
 
@@ -132,16 +136,52 @@ navigation shell (topbar + Panel/Cameras menu), a **cameras** table with paginat
 create/edit in a **modal** (Reactive Forms + validation mirroring the backend) and
 actions restricted to **ADMIN** (OPERATOR sees read-only). On the backend, camera
 **reactivation** was added (`POST /api/v1/cameras/{id}/activate`), making the
-soft-delete reversible (ADR-026). Test coverage expanded: **43** backend integration
-tests and **16** on the frontend (Vitest), including role authorization (403/401).
+soft-delete reversible (ADR-026).
 
-**Performance — Phase 5 (in progress):** an **A/B benchmark with vs without
-indexes** over 10M detections, measuring reads, writes and disk in a fixed-resource
-Docker environment (ADR-027). Results: plate lookup ~11,000× faster; camera+time
-range with a **composite** index `(camera_id, detected_at)` ~83×; BRIN (40 kB) ~60×
-on a recent window; writes ~2.75× slower and ~602 MB of indexes. The harness
-(not versioned) lives in `bench/`. **Pending:** concurrency tests, k6 load testing
-and the camera simulator.
+**Frontend — watchlist management (done):** the second data screen, following the
+cameras pattern (paginated table + modal). To align it, the watchlist backend gained
+a **reversible soft-delete** (`DELETE` now sets `active=false`), **reactivation**
+(`POST /api/v1/watchlist/{id}/activate`) and **reason reclassification**
+(`PUT /api/v1/watchlist/{id}`, `reason` only — the plate is immutable), all restricted
+to ADMIN (ADR-028). The screen validates the plate on the client (same Mercosur/old
+format as the backend), shows the reason (Robbery/Theft/Wanted/Suspect) and status,
+with plates in a monospace font. Common data-screen styles were extracted into a
+shared SCSS partial. Coverage expanded: **53** backend integration tests and **32**
+on the frontend (Vitest), including role authorization (403/401).
 
-Next steps: finish Phase 5 (concurrency, k6, simulator) and build the detections,
-watchlist and real-time alerts dashboard screens (Phase 6).
+**Performance — Phase 5 (benchmark done; load testing deferred):** an **A/B
+benchmark with vs without indexes** over 10M detections, measuring reads, writes and
+disk in a fixed-resource Docker environment (ADR-027). Results: plate lookup
+~11,000× faster; camera+time range with a **composite** index
+`(camera_id, detected_at)` ~83×; BRIN (40 kB) ~60× on a recent window; writes ~2.75×
+slower and ~602 MB of indexes. The harness (not versioned) lives in `bench/`.
+**Deferred** (off the MVP critical path): concurrency tests, k6 load testing and the
+camera simulator.
+
+## Current moment
+
+The backend exposes the **complete MVP REST API** (auth, cameras + API keys,
+detections, watchlist, alerts) and the **real-time alert broadcast** (STOMP
+`/topic/alerts`), all covered by **53 integration tests**. The focus now is the
+**frontend consuming those resources** — login, cameras and watchlist are already
+done.
+
+**API coverage by the frontend:**
+
+| Resource                                       | Backend | Screen |
+|------------------------------------------------|:-------:|:------:|
+| Authentication (login / refresh)               |   ✅    |   ✅   |
+| Cameras (CRUD)                                  |   ✅    |   ✅   |
+| Per-camera API keys (issue / list / revoke)     |  ✅    |   ⚪   |
+| Detections (keyset query + filters)            |   ✅    |   ⚪   |
+| Watchlist (CRUD + reclassification)            |   ✅    |   ✅   |
+| Alerts (list / filter + status change)         |   ✅    |   ⚪   |
+| Real-time alerts (`/topic/alerts`)             |   ✅    |   ⚪   |
+
+> Detection ingestion (`POST /api/v1/detections`) is consumed by the **camera**
+> (via API key), not by the UI — hence no screen.
+
+**Next screens:** detections (history with filters and **cursor** pagination),
+alerts (triage) + a **WebSocket/STOMP client** for live alerts, **API key**
+management inside the cameras screen, and a real **panel** (`home`) with metrics —
+today the home is just a placeholder.

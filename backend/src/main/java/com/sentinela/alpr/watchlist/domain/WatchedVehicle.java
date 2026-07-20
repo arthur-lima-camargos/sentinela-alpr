@@ -61,8 +61,16 @@ public class WatchedVehicle {
 		return reason;
 	}
 
+	void setReason(WatchReason reason) {
+		this.reason = reason;
+	}
+
 	boolean isActive() {
 		return active;
+	}
+
+	void setActive(boolean active) {
+		this.active = active;
 	}
 
 	Instant getCreatedAt() {

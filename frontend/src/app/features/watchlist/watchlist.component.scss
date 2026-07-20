@@ -1,0 +1,20 @@
+@use '../../shared/styles/data-screen';
+
+/* --- extras da watchlist --- */
+
+/* motivo do monitoramento (roubo/furto/procurado/suspeito) */
+.badge--reason {
+  color: var(--cor-atencao);
+  border-color: var(--cor-atencao);
+}
+
+.field--check {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--esp-2);
+}
+
+.field__hint {
+  font-size: 0.78rem;
+  color: var(--cor-texto-fraco);
+}
