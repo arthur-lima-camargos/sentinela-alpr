@@ -21,7 +21,6 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-      # Testcontainers usa o Docker já disponível no runner ubuntu-latest.
       - name: Build e testes (mvnw verify)
         run: |
           chmod +x mvnw
