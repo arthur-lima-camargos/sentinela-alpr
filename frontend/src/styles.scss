@@ -1,1 +1,53 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  /* semantic colors */
+  --cor-fundo: #0e1621;
+  --cor-superficie: #16212e;
+  --cor-superficie-2: #1e2b3a;
+  --cor-borda: #2a3a4d;
+  --cor-texto: #e8eef5;
+  --cor-texto-fraco: #9db0c4;
+  --cor-primaria: #3b82f6;
+  --cor-primaria-forte: #2563eb;
+  --cor-critico: #ef4444;
+  --cor-atencao: #f59e0b;
+  --cor-ok: #22c55e;
+  --cor-foco: #7dd3fc;
+
+  /* Spaces (multiple of 4px) */
+  --esp-1: 4px;
+  --esp-2: 8px;
+  --esp-3: 12px;
+  --esp-4: 16px;
+  --esp-5: 20px;
+  --esp-6: 24px;
+  --esp-8: 32px;
+
+  /* Typography */
+  --fonte-base: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --fonte-mono: ui-monospace, "Cascadia Code", "Consolas", "Courier New", monospace;
+  --raio: 8px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
+  font-family: var(--fonte-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:focus-visible {
+  outline: 2px solid var(--cor-foco);
+  outline-offset: 2px;
+}

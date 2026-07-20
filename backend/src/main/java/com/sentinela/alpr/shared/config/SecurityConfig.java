@@ -25,9 +25,12 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.sentinela.alpr.auth.domain.JwtProperties;
+import com.sentinela.alpr.cameras.domain.CameraApiKeyService;
+import com.sentinela.alpr.cameras.infra.CameraApiKeyAuthFilter;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -42,26 +45,30 @@ class SecurityConfig {
 	}
 
 	@Bean
-	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	SecurityFilterChain filterChain(HttpSecurity http, CameraApiKeyService apiKeyService) throws Exception {
+		CameraApiKeyAuthFilter cameraApiKeyAuthFilter = new CameraApiKeyAuthFilter(apiKeyService);
 		http
 				.csrf(csrf -> csrf.disable())
 				.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(auth -> auth
-						// Público
+						// Public
 						.requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
 						.requestMatchers("/actuator/health/**").permitAll()
-						// Provisório: handshake do STOMP (segurança na Fase 4c)
+						// Handshake
 						.requestMatchers("/ws/**").permitAll()
-						// Provisório: ingestão de detecções (vira API Key na Fase 4b)
-						.requestMatchers(HttpMethod.POST, "/api/v1/detections/**").permitAll()
-						// Escrita de cadastros exige ADMIN
+						// Detection
+						.requestMatchers(HttpMethod.POST, "/api/v1/detections/**").hasRole("CAMERA")
+						// keys handler
+						.requestMatchers("/api/v1/cameras/*/api-keys/**").hasRole("ADMIN")
+						// write methods requires ADMIN
 						.requestMatchers(HttpMethod.POST, "/api/v1/cameras/**", "/api/v1/watchlist/**").hasRole("ADMIN")
 						.requestMatchers(HttpMethod.PUT, "/api/v1/cameras/**", "/api/v1/watchlist/**").hasRole("ADMIN")
 						.requestMatchers(HttpMethod.DELETE, "/api/v1/cameras/**", "/api/v1/watchlist/**").hasRole("ADMIN")
-						// Demais exigem autenticação (OPERATOR ou ADMIN)
+						// read methods require any authenticated user
 						.anyRequest().authenticated())
 				.oauth2ResourceServer(oauth2 -> oauth2
 						.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
+				.addFilterBefore(cameraApiKeyAuthFilter, AnonymousAuthenticationFilter.class)
 				.exceptionHandling(ex -> ex
 						.authenticationEntryPoint(problemDetailEntryPoint())
 						.accessDeniedHandler(problemDetailAccessDeniedHandler()));

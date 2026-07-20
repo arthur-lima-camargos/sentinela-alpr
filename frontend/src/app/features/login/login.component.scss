@@ -1,0 +1,116 @@
+:host {
+  display: block;
+  height: 100dvh;
+}
+
+.login-page {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--esp-4);
+}
+
+.card {
+  width: 100%;
+  max-width: 360px;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  padding: var(--esp-8) var(--esp-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-5);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+.brand {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+}
+
+.brand__mark {
+  color: var(--cor-primaria);
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.brand__name {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.brand__name span {
+  color: var(--cor-primaria);
+}
+
+.brand__sub {
+  margin: 0;
+  color: var(--cor-texto-fraco);
+  font-size: 0.8rem;
+}
+
+.alert {
+  margin: 0;
+  padding: var(--esp-3);
+  border-radius: var(--raio);
+  background: color-mix(in srgb, var(--cor-critico) 15%, transparent);
+  border: 1px solid var(--cor-critico);
+  color: var(--cor-texto);
+  font-size: 0.85rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+}
+
+.field__label {
+  font-size: 0.8rem;
+  color: var(--cor-texto-fraco);
+}
+
+.field__input {
+  padding: var(--esp-3);
+  border-radius: var(--raio);
+  border: 1px solid var(--cor-borda);
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
+  font-size: 0.95rem;
+}
+
+.field__input[aria-invalid='true'] {
+  border-color: var(--cor-critico);
+}
+
+.field__error {
+  font-size: 0.75rem;
+  color: var(--cor-critico);
+}
+
+.submit {
+  margin-top: var(--esp-2);
+  padding: var(--esp-3);
+  border: 0;
+  border-radius: var(--raio);
+  background: var(--cor-primaria);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.submit:hover:not(:disabled) {
+  background: var(--cor-primaria-forte);
+}
+
+.submit:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}

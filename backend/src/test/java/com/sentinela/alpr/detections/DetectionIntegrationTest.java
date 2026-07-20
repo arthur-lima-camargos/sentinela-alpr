@@ -11,31 +11,24 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestClient;
 
-import com.sentinela.alpr.cameras.api.CameraResponse;
+import com.sentinela.alpr.cameras.api.IssuedApiKeyResponse;
 import com.sentinela.alpr.detections.api.DetectionPage;
 import com.sentinela.alpr.detections.api.DetectionResponse;
 import com.sentinela.alpr.support.AbstractIntegrationTest;
 
 class DetectionIntegrationTest extends AbstractIntegrationTest {
 
-	private Long activeCamera() {
-		return client.post().uri("/api/v1/cameras")
-				.contentType(MediaType.APPLICATION_JSON)
-				.body(Map.of("name", "Cam"))
-				.retrieve().body(CameraResponse.class).id();
-	}
-
-	private Map<String, Object> body(Object cameraId, String plate, String detectedAt) {
+	private Map<String, Object> body(String plate, String detectedAt) {
 		Map<String, Object> body = new HashMap<>();
 		body.put("plate", plate);
-		body.put("cameraId", cameraId);
 		body.put("detectedAt", detectedAt);
 		return body;
 	}
 
-	private ResponseEntity<String> post(Map<String, Object> body) {
-		return client.post().uri("/api/v1/detections")
+	private ResponseEntity<String> postWith(RestClient camera, Map<String, Object> body) {
+		return camera.post().uri("/api/v1/detections")
 				.contentType(MediaType.APPLICATION_JSON)
 				.body(body)
 				.retrieve().onStatus(status -> status.isError(), (req, res) -> {
@@ -43,37 +36,62 @@ class DetectionIntegrationTest extends AbstractIntegrationTest {
 	}
 
 	@Test
-	void recordWithActiveCameraReturns201() {
-		DetectionResponse created = client.post().uri("/api/v1/detections")
+	void recordWithValidApiKeyReturns201AndDerivesCamera() {
+		Long cameraId = createCamera("Cam");
+		RestClient camera = cameraClient(mintApiKey(cameraId));
+
+		DetectionResponse created = camera.post().uri("/api/v1/detections")
 				.contentType(MediaType.APPLICATION_JSON)
-				.body(body(activeCamera(), "ABC1234", "2026-07-18T10:00:00Z"))
+				.body(body("ABC1234", "2026-07-18T10:00:00Z"))
 				.retrieve().toEntity(DetectionResponse.class).getBody();
 
 		assertThat(created).isNotNull();
 		assertThat(created.id()).isNotNull();
 		assertThat(created.plate()).isEqualTo("ABC1234");
+		assertThat(created.cameraId()).isEqualTo(cameraId);
 	}
 
 	@Test
-	void recordWithUnknownCameraReturns404() {
-		ResponseEntity<String> response = post(body(9999, "ABC1234", "2026-07-18T10:00:00Z"));
-		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+	void recordWithoutApiKeyReturns401() {
+		ResponseEntity<String> response = postWith(anonymousClient, body("ABC1234", "2026-07-18T10:00:00Z"));
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
 	}
 
 	@Test
-	void recordWithInactiveCameraReturns422() {
-		Long cameraId = activeCamera();
+	void recordWithInvalidApiKeyReturns401() {
+		ResponseEntity<String> response = postWith(cameraClient("alpr_invalida"), body("ABC1234", "2026-07-18T10:00:00Z"));
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+	}
+
+	@Test
+	void recordWithRevokedApiKeyReturns401() {
+		Long cameraId = createCamera("Cam");
+		IssuedApiKeyResponse issued = client.post().uri("/api/v1/cameras/" + cameraId + "/api-keys")
+				.retrieve().body(IssuedApiKeyResponse.class);
+		client.delete().uri("/api/v1/cameras/" + cameraId + "/api-keys/" + issued.id())
+				.retrieve().toBodilessEntity();
+
+		ResponseEntity<String> response = postWith(cameraClient(issued.apiKey()),
+				body("ABC1234", "2026-07-18T10:00:00Z"));
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+	}
+
+	@Test
+	void recordWithInactiveCameraReturns401() {
+		Long cameraId = createCamera("Cam");
+		RestClient camera = cameraClient(mintApiKey(cameraId));
 		client.delete().uri("/api/v1/cameras/" + cameraId).retrieve().toBodilessEntity();
 
-		ResponseEntity<String> response = post(body(cameraId, "ABC1234", "2026-07-18T10:00:00Z"));
-		assertThat(response.getStatusCode().value()).isEqualTo(422);
+		ResponseEntity<String> response = postWith(camera, body("ABC1234", "2026-07-18T10:00:00Z"));
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
 	}
 
 	@Test
 	void keysetPaginationWalksAllRowsInOrderWithoutDuplicates() {
-		Long cameraId = activeCamera();
+		Long cameraId = createCamera("Cam");
+		RestClient camera = cameraClient(mintApiKey(cameraId));
 		for (int i = 0; i < 5; i++) {
-			post(body(cameraId, "ABC1234", "2026-07-18T10:0" + i + ":00Z"));
+			postWith(camera, body("ABC1234", "2026-07-18T10:0" + i + ":00Z"));
 		}
 
 		Set<Long> seen = new LinkedHashSet<>();

@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sentinela.alpr.alerts.api.AlertResponse;
 import com.sentinela.alpr.alerts.domain.AlertStatus;
-import com.sentinela.alpr.cameras.api.CameraResponse;
 import com.sentinela.alpr.support.AbstractIntegrationTest;
 
 class AlertFlowIntegrationTest extends AbstractIntegrationTest {
@@ -26,10 +25,7 @@ class AlertFlowIntegrationTest extends AbstractIntegrationTest {
 	}
 
 	private Long camera() {
-		return client.post().uri("/api/v1/cameras")
-				.contentType(MediaType.APPLICATION_JSON)
-				.body(Map.of("name", "Cam"))
-				.retrieve().body(CameraResponse.class).id();
+		return createCamera("Cam");
 	}
 
 	private void watch(String plate) {
@@ -42,9 +38,8 @@ class AlertFlowIntegrationTest extends AbstractIntegrationTest {
 	private void detect(Long cameraId, String plate) {
 		Map<String, Object> body = new HashMap<>();
 		body.put("plate", plate);
-		body.put("cameraId", cameraId);
 		body.put("detectedAt", "2026-07-18T10:00:00Z");
-		client.post().uri("/api/v1/detections")
+		cameraClient(mintApiKey(cameraId)).post().uri("/api/v1/detections")
 				.contentType(MediaType.APPLICATION_JSON)
 				.body(body)
 				.retrieve().toBodilessEntity();

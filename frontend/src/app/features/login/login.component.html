@@ -1,0 +1,46 @@
+<main class="login-page">
+  <form class="card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <header class="brand">
+      <span class="brand__mark" aria-hidden="true">◈</span>
+      <h1 class="brand__name">Sentinela <span>ALPR</span></h1>
+      <p class="brand__sub">Monitoramento veicular — acesso restrito</p>
+    </header>
+
+    @if (errorMsg(); as msg) {
+      <p class="alert" role="alert">{{ msg }}</p>
+    }
+
+    <label class="field">
+      <span class="field__label">Usuário</span>
+      <input
+        class="field__input"
+        type="text"
+        formControlName="login"
+        autocomplete="username"
+        autocapitalize="none"
+        [attr.aria-invalid]="form.controls.login.touched && form.controls.login.invalid"
+      />
+      @if (form.controls.login.touched && form.controls.login.invalid) {
+        <span class="field__error">Informe o usuário.</span>
+      }
+    </label>
+
+    <label class="field">
+      <span class="field__label">Senha</span>
+      <input
+        class="field__input"
+        type="password"
+        formControlName="password"
+        autocomplete="current-password"
+        [attr.aria-invalid]="form.controls.password.touched && form.controls.password.invalid"
+      />
+      @if (form.controls.password.touched && form.controls.password.invalid) {
+        <span class="field__error">Informe a senha.</span>
+      }
+    </label>
+
+    <button class="submit" type="submit" [disabled]="loading()">
+      {{ loading() ? 'Entrando…' : 'Entrar' }}
+    </button>
+  </form>
+</main>

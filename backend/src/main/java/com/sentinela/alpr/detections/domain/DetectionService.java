@@ -7,14 +7,11 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.sentinela.alpr.cameras.api.CameraResponse;
-import com.sentinela.alpr.cameras.domain.CameraService;
 import com.sentinela.alpr.detections.api.DetectionPage;
 import com.sentinela.alpr.detections.api.DetectionRequest;
 import com.sentinela.alpr.detections.api.DetectionResponse;
 import com.sentinela.alpr.detections.infra.DetectionRepository;
 import com.sentinela.alpr.shared.error.BusinessRuleException;
-import com.sentinela.alpr.shared.error.NotFoundException;
 import com.sentinela.alpr.shared.event.DomainEventPublisher;
 import com.sentinela.alpr.shared.support.PlateNormalizer;
 
@@ -25,26 +22,18 @@ public class DetectionService {
 	static final int DEFAULT_PAGE_SIZE = 20;
 
 	private final DetectionRepository repository;
-	private final CameraService cameraService;
 	private final DomainEventPublisher events;
 
-	DetectionService(DetectionRepository repository, CameraService cameraService, DomainEventPublisher events) {
+	DetectionService(DetectionRepository repository, DomainEventPublisher events) {
 		this.repository = repository;
-		this.cameraService = cameraService;
 		this.events = events;
 	}
 
 	@Transactional
-	public DetectionResponse record(DetectionRequest request) {
+	public DetectionResponse record(Long cameraId, DetectionRequest request) {
 		String plate = normalizePlate(request.plate());
 
-		CameraResponse camera = cameraService.findById(request.cameraId())
-				.orElseThrow(() -> new NotFoundException("Camera not found: " + request.cameraId()));
-		if (!camera.active()) {
-			throw new BusinessRuleException("Inactive Camera: " + request.cameraId());
-		}
-
-		Detection saved = repository.save(new Detection(plate, request.cameraId(), request.detectedAt()));
+		Detection saved = repository.save(new Detection(plate, cameraId, request.detectedAt()));
 		events.publish(new DetectionRecordedEvent(saved.getId(), saved.getPlate(),
 				saved.getCameraId(), saved.getDetectedAt()));
 		return toResponse(saved);

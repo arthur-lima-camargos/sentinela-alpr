@@ -5,6 +5,7 @@ import java.time.Instant;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,8 +28,10 @@ class DetectionController {
 	}
 
 	@PostMapping
-	ResponseEntity<DetectionResponse> record(@Valid @RequestBody DetectionRequest request) {
-		DetectionResponse created = service.record(request);
+	ResponseEntity<DetectionResponse> record(
+			@AuthenticationPrincipal Long cameraId,
+			@Valid @RequestBody DetectionRequest request) {
+		DetectionResponse created = service.record(cameraId, request);
 		return ResponseEntity.created(URI.create("/api/v1/detections/" + created.id())).body(created);
 	}
 

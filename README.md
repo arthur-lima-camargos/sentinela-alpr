@@ -43,7 +43,7 @@ consulta o histórico e dispara **alertas** quando uma placa monitorada é vista
 | 1 | Ambiente                    | ✅ Concluído    |
 | 2 | Scaffold                    | ✅ Concluído    |
 | 3 | Domínio                     | ✅ Concluído    |
-| 4 | Segurança (JWT)             | 🟡 Em andamento |
+| 4 | Segurança (JWT)             | ✅ Concluído    |
 | 5 | Desempenho                  | ⚪ Pendente     |
 | 6 | Tempo real                  | ⚪ Pendente     |
 
@@ -100,6 +100,32 @@ geração de alerta usa `AFTER_COMMIT` + `REQUIRES_NEW` (ADR-020).
 stateless (ADR-022); senha com **BCrypt**; perfis `OPERATOR`/`ADMIN` (escrita de
 câmeras/watchlist exige ADMIN); 401/403 em `ProblemDetail`; usuário admin de dev
 semeado na migration `V2` (ADR-023). **27 testes de integração** (Testcontainers)
-verdes. Ingestão de detecções (`POST /detections`) e o handshake WebSocket seguem
-liberados provisoriamente. Próximos passos: **4b — API Key das câmeras** e
-**4c — segurança no WebSocket**.
+verdes.
+
+**Segurança — Fase 4b (API Key das câmeras) concluída:** ingestão
+`POST /api/v1/detections` deixou de ser pública e passou a exigir **API Key por
+câmera** no header `X-API-Key` (`ROLE_CAMERA` via filtro). Chaves em tabela
+dedicada `camera_api_key` (migration `V3`), guardando só o **hash SHA-256** (não
+BCrypt — chave de alta entropia e busca determinística); emissão devolve o segredo
+**uma única vez** (`POST /cameras/{id}/api-keys`, ADMIN), com listagem e revogação.
+O `cameraId` agora é **derivado da chave** (saiu do corpo). Chave ausente/inválida/
+câmera inativa → 401. Detalhes em ADR-024.
+
+**Segurança — Fase 4c (WebSocket/STOMP) concluída:** a conexão de tempo real é
+autenticada no **frame STOMP `CONNECT`** por um `ChannelInterceptor` que valida o
+JWT (header `Authorization`) reusando o `JwtDecoder`; sem token válido a conexão é
+recusada. Só usuário autenticado assina `/topic/alerts`. Detalhes em ADR-025. Com
+isso a **Fase 4 está concluída**: **36 testes de integração** verdes (inclui STOMP
+com `WebSocketStompClient`). O cliente WebSocket no Angular chega na **Fase 6
+(Tempo real)**.
+
+**Frontend — login (Fase 4) concluído:** app Angular com estrutura `core/features`,
+tela de **login** (Reactive Forms, estados de carregando/erro), `AuthService`
+(signals + `localStorage`), **interceptor** que anexa `Bearer` e faz **silent
+refresh no 401** (single-flight), **guard** de rota e um shell protegido (`home`)
+com usuário logado e logout. Tokens de design (tema escuro) em `styles.scss`;
+proxy do Angular CLI (`/api → :8080`) para o dev cross-origin. Fluxo validado ponta
+a ponta pelo proxy (login/refresh/401/403).
+
+Com a Fase 4 concluída, o **próximo passo é a Fase 5 — Desempenho** (seed de alto
+volume, índices, concorrência e carga com k6).

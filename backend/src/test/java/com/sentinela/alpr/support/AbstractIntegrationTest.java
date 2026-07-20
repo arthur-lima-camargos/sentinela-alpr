@@ -14,6 +14,8 @@ import org.springframework.web.client.RestClient;
 
 import com.sentinela.alpr.TestcontainersConfiguration;
 import com.sentinela.alpr.auth.api.TokenResponse;
+import com.sentinela.alpr.cameras.api.CameraResponse;
+import com.sentinela.alpr.cameras.api.IssuedApiKeyResponse;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(TestcontainersConfiguration.class)
@@ -67,5 +69,27 @@ public abstract class AbstractIntegrationTest {
 
 	protected RestClient clientFor(String login, String rawPassword) {
 		return clientWithToken(accessToken(login, rawPassword));
+	}
+
+	protected Long createCamera(String name) {
+		return client.post().uri("/api/v1/cameras")
+				.contentType(MediaType.APPLICATION_JSON)
+				.body(Map.of("name", name))
+				.retrieve().body(CameraResponse.class).id();
+	}
+
+	protected String mintApiKey(Long cameraId) {
+		IssuedApiKeyResponse issued = client.post().uri("/api/v1/cameras/" + cameraId + "/api-keys")
+				.retrieve().body(IssuedApiKeyResponse.class);
+		return issued.apiKey();
+	}
+
+	protected RestClient cameraClient(String apiKey) {
+		return RestClient.builder().baseUrl(baseUrl)
+				.defaultHeaders(h -> h.set("X-API-Key", apiKey)).build();
+	}
+
+	protected String wsUrl() {
+		return "ws://localhost:" + port + "/ws";
 	}
 }
