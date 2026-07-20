@@ -1,0 +1,75 @@
+<section class="page">
+  <header class="page__head">
+    <div>
+      <h1>Alertas</h1>
+      <p class="page__sub">
+        {{ totalElements() }} alerta(s)
+        <span class="live" [class.live--on]="connected()" [attr.title]="connected() ? 'Tempo real conectado' : 'Tempo real desconectado'">
+          <span class="live__dot" aria-hidden="true"></span>{{ connected() ? 'ao vivo' : 'offline' }}
+        </span>
+      </p>
+    </div>
+
+    <div class="segmented" role="group" aria-label="Filtrar por status">
+      <button type="button" class="seg" [class.seg--active]="statusFilter() === null" (click)="setFilter(null)">Todos</button>
+      <button type="button" class="seg" [class.seg--active]="statusFilter() === 'NEW'" (click)="setFilter('NEW')">Novos</button>
+      <button type="button" class="seg" [class.seg--active]="statusFilter() === 'SEEN'" (click)="setFilter('SEEN')">Vistos</button>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="state" role="status">Carregando…</div>
+  } @else if (error()) {
+    <div class="state state--error" role="alert">
+      {{ error() }}
+      <button class="btn" type="button" (click)="load(page())">Tentar de novo</button>
+    </div>
+  } @else if (items().length === 0) {
+    <div class="state">Nenhum alerta para o filtro selecionado.</div>
+  } @else {
+    <div class="table-wrap" role="region" aria-live="polite" aria-label="Lista de alertas">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Placa</th>
+            <th>Motivo</th>
+            <th>Detectado em</th>
+            <th>Status</th>
+            <th class="table__actions">Ação</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (a of items(); track a.id) {
+            <tr [class.row--live]="isLive(a.id)" [class.row--seen]="a.status === 'SEEN'">
+              <td class="mono">{{ a.plate }}</td>
+              <td>{{ reasonFor(a.watchedVehicleId) }}</td>
+              <td>{{ a.detectedAt | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
+              <td>
+                @if (a.status === 'NEW') {
+                  <span class="badge badge--critical"><span aria-hidden="true">⚠</span> Novo</span>
+                } @else {
+                  <span class="badge badge--off">Visto</span>
+                }
+              </td>
+              <td class="table__actions">
+                @if (a.status === 'NEW') {
+                  <button class="btn btn--sm" type="button" (click)="markSeen(a)">Marcar como visto</button>
+                } @else {
+                  <button class="btn btn--sm" type="button" (click)="reopen(a)">Reabrir</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (totalPages() > 1) {
+      <footer class="pager">
+        <button class="btn btn--sm" type="button" [disabled]="page() === 0" (click)="prev()">Anterior</button>
+        <span class="pager__info">Página {{ page() + 1 }} de {{ totalPages() }}</span>
+        <button class="btn btn--sm" type="button" [disabled]="page() + 1 >= totalPages()" (click)="next()">Próxima</button>
+      </footer>
+    }
+  }
+</section>

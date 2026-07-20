@@ -154,8 +154,20 @@ button that appends the next batch (the cursor is forward-only). Filters for **p
 (exact match, normalized on the client), **camera** (dropdown), and **time range**
 (from/to via `datetime-local`, converted to a UTC `Instant`). Each detection's
 `cameraId` is resolved to the **camera name** by fetching the camera list once.
-Read-only (any role). Coverage expanded: **53** backend integration tests and **43**
-on the frontend (Vitest), including role authorization (403/401).
+Read-only (any role).
+
+**Frontend — alerts and real time (done):** the flagship screen. An alert list
+(`GET /api/v1/alerts`) with a **status filter** (All/New/Seen), triage via `PATCH`
+(**"Mark as seen"/"Reopen"**) and an urgency badge (NEW in critical color + icon +
+text). **Real time** uses a **STOMP** client (`@stomp/stompjs`) that connects to `/ws`
+authenticating with the **access token in the `CONNECT` frame** (pulled on each
+attempt, surviving refresh), auto-reconnects and subscribes to `/topic/alerts`. The
+`AlertRealtimeService` lives in the **shell** (app-wide): a **bell with a counter** in
+the topbar lights up when an alert arrives (always visible), and the screen itself
+**prepends the alert live**, with a fading highlight. The alert reason
+(Robbery/Theft…) is resolved from the watchlist. Dev proxy `/ws` (`ws: true`);
+ADR-029. Coverage expanded: **53** backend integration tests and **56** on the
+frontend (Vitest); the STOMP connection itself is verified at runtime.
 
 **Performance — Phase 5 (benchmark done; load testing deferred):** an **A/B
 benchmark with vs without indexes** over 10M detections, measuring reads, writes and
@@ -171,8 +183,9 @@ camera simulator.
 The backend exposes the **complete MVP REST API** (auth, cameras + API keys,
 detections, watchlist, alerts) and the **real-time alert broadcast** (STOMP
 `/topic/alerts`), all covered by **53 integration tests**. The focus now is the
-**frontend consuming those resources** — login, cameras and watchlist are already
-done.
+**frontend consuming those resources** — login, cameras, watchlist, detections and
+alerts (with real time) are already done; API key management and the initial panel
+remain.
 
 **API coverage by the frontend:**
 
@@ -183,12 +196,11 @@ done.
 | Per-camera API keys (issue / list / revoke)     |  ✅    |   ⚪   |
 | Detections (keyset query + filters)            |   ✅    |   ✅   |
 | Watchlist (CRUD + reclassification)            |   ✅    |   ✅   |
-| Alerts (list / filter + status change)         |   ✅    |   ⚪   |
-| Real-time alerts (`/topic/alerts`)             |   ✅    |   ⚪   |
+| Alerts (list / filter + status change)         |   ✅    |   ✅   |
+| Real-time alerts (`/topic/alerts`)             |   ✅    |   ✅   |
 
 > Detection ingestion (`POST /api/v1/detections`) is consumed by the **camera**
 > (via API key), not by the UI — hence no screen.
 
-**Next screens:** alerts (triage) + a **WebSocket/STOMP client** for live alerts,
-**API key** management inside the cameras screen, and a real **panel** (`home`) with
-metrics — today the home is just a placeholder.
+**Next screens:** **API key** management inside the cameras screen, and a real
+**panel** (`home`) with metrics — today the home is just a placeholder.

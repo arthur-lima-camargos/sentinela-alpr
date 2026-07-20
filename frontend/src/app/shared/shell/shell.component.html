@@ -8,12 +8,20 @@
     <a routerLink="/" routerLinkActive="nav__link--active" [routerLinkActiveOptions]="{ exact: true }"
        class="nav__link">Painel</a>
     <a routerLink="/detections" routerLinkActive="nav__link--active" class="nav__link">Passagens</a>
+    <a routerLink="/alerts" routerLinkActive="nav__link--active" class="nav__link">Alertas</a>
     <a routerLink="/cameras" routerLinkActive="nav__link--active" class="nav__link">Câmeras</a>
     <a routerLink="/watchlist" routerLinkActive="nav__link--active" class="nav__link">Monitorados</a>
   </nav>
 
   @if (user(); as u) {
     <div class="topbar__user">
+      <a routerLink="/alerts" class="bell" [class.bell--on]="liveCount() > 0"
+         title="Alertas ao vivo" aria-label="Alertas em tempo real">
+        <span aria-hidden="true">🔔</span>
+        @if (liveCount() > 0) {
+          <span class="bell__count" role="status" aria-live="polite">{{ liveCount() }}</span>
+        }
+      </a>
       <span class="topbar__login">{{ u.login }}</span>
       <span class="badge" [class.badge--admin]="u.role === 'ADMIN'">{{ u.role }}</span>
       <button class="logout" type="button" (click)="logout()">Sair</button>

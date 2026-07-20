@@ -155,8 +155,20 @@ mais"** que anexa a próxima leva (o cursor é forward-only). Filtros de **placa
 (busca exata, normalizada no cliente), **câmera** (dropdown), e **período** (de/até
 via `datetime-local`, convertidos para `Instant` UTC). O `cameraId` da passagem é
 resolvido para o **nome da câmera** buscando a lista de câmeras uma vez. Somente
-leitura (qualquer perfil). Cobertura ampliada: **53** testes de integração no backend
-e **43** no frontend (Vitest), incluindo autorização por perfil (403/401).
+leitura (qualquer perfil).
+
+**Frontend — alertas e tempo real (concluído):** a tela-vitrine. Lista de alertas
+(`GET /api/v1/alerts`) com **filtro por status** (Todos/Novos/Vistos), triagem via
+`PATCH` (**"Marcar como visto"/"Reabrir"**) e badge de urgência (NEW em cor crítica +
+ícone + texto). O **tempo real** usa um cliente **STOMP** (`@stomp/stompjs`) que
+conecta ao `/ws` autenticando com o **access token no frame `CONNECT`** (puxado a cada
+tentativa, sobrevivendo a refresh), reconecta sozinho e assina `/topic/alerts`. O
+`AlertRealtimeService` vive no **shell** (app-wide): um **sino com contador** no
+topbar acende ao chegar alerta (sempre visível), e a própria tela **insere o alerta
+no topo ao vivo**, com destaque que esmaece. O motivo do alerta (Roubo/Furto…) é
+resolvido pela watchlist. Proxy de dev `/ws` (`ws: true`); ADR-029. Cobertura
+ampliada: **53** testes de integração no backend e **56** no frontend (Vitest); a
+conexão STOMP em si é verificada em runtime.
 
 **Desempenho — Fase 5 (benchmark concluído; carga adiada):** conduzido um
 **benchmark comparativo com/sem índice** sobre 10M passagens, medindo leitura,
@@ -172,7 +184,8 @@ simulador de câmeras.
 O backend expõe a **API REST completa do MVP** (auth, câmeras + API keys, passagens,
 watchlist, alertas) e o **broadcast de alertas em tempo real** (STOMP
 `/topic/alerts`), tudo coberto por **53 testes de integração**. O foco agora é o
-**frontend consumindo esses recursos** — login, câmeras e watchlist já prontos.
+**frontend consumindo esses recursos** — login, câmeras, watchlist, passagens e
+alertas (com tempo real) já prontos; faltam a gestão de API keys e o painel inicial.
 
 **Cobertura da API pelo frontend:**
 
@@ -183,12 +196,11 @@ watchlist, alertas) e o **broadcast de alertas em tempo real** (STOMP
 | API keys por câmera (emitir / listar / revogar) | ✅    |  ⚪  |
 | Passagens (consulta por keyset + filtros)      |   ✅    |  ✅  |
 | Watchlist (CRUD + reclassificação)             |   ✅    |  ✅  |
-| Alertas (listar / filtrar + mudar status)      |   ✅    |  ⚪  |
-| Alertas em tempo real (`/topic/alerts`)        |   ✅    |  ⚪  |
+| Alertas (listar / filtrar + mudar status)      |   ✅    |  ✅  |
+| Alertas em tempo real (`/topic/alerts`)        |   ✅    |  ✅  |
 
 > A ingestão de passagens (`POST /api/v1/detections`) é consumida pela **câmera**
 > (via API key), não pela UI — por isso não tem tela.
 
-**Próximas telas:** alertas (triagem) + **cliente WebSocket/STOMP** para alertas ao
-vivo, gestão de **API keys** dentro da tela de câmeras, e um **painel** (`home`) real
-com métricas — hoje a home é apenas um placeholder.
+**Próximas telas:** gestão de **API keys** dentro da tela de câmeras e um **painel**
+(`home`) real com métricas — hoje a home é apenas um placeholder.

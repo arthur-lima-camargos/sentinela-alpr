@@ -1,0 +1,82 @@
+@use '../../shared/styles/data-screen';
+
+/* --- badge crítico (alerta novo) --- */
+.badge--critical {
+  color: #fff;
+  background: var(--cor-critico);
+  border-color: var(--cor-critico);
+}
+
+/* --- filtro segmentado --- */
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  overflow: hidden;
+}
+
+.seg {
+  padding: var(--esp-2) var(--esp-4);
+  border: none;
+  border-left: 1px solid var(--cor-borda);
+  background: var(--cor-superficie-2);
+  color: var(--cor-texto);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.seg:first-child {
+  border-left: none;
+}
+
+.seg--active {
+  background: var(--cor-primaria);
+  color: #fff;
+}
+
+/* --- indicador de tempo real --- */
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-1);
+  margin-left: var(--esp-2);
+  font-size: 0.78rem;
+  color: var(--cor-texto-fraco);
+}
+
+.live__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cor-texto-fraco);
+}
+
+.live--on .live__dot {
+  background: var(--cor-ok);
+}
+
+/* --- linhas --- */
+.row--seen td {
+  color: var(--cor-texto-fraco);
+}
+
+/* alerta recém-chegado ao vivo: destaque que esmaece */
+.row--live {
+  animation: flash-live 2s ease-out;
+}
+
+@keyframes flash-live {
+  0% {
+    background: color-mix(in srgb, var(--cor-critico) 35%, transparent);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row--live {
+    animation: none;
+    box-shadow: inset 3px 0 0 0 var(--cor-critico);
+  }
+}
