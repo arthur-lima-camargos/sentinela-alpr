@@ -1,0 +1,97 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-6);
+  padding: var(--esp-3) var(--esp-6);
+  background: var(--cor-superficie);
+  border-bottom: 1px solid var(--cor-borda);
+}
+
+.topbar__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+
+.topbar__mark {
+  color: var(--cor-primaria);
+  font-size: 1.3rem;
+}
+
+.nav {
+  display: flex;
+  gap: var(--esp-2);
+}
+
+.nav__link {
+  padding: var(--esp-2) var(--esp-3);
+  border-radius: var(--raio);
+  color: var(--cor-texto-fraco);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.nav__link:hover {
+  color: var(--cor-texto);
+  background: var(--cor-superficie-2);
+}
+
+.nav__link--active {
+  color: var(--cor-texto);
+  background: var(--cor-superficie-2);
+}
+
+.topbar__user {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  margin-left: auto;
+}
+
+.topbar__login {
+  font-size: 0.9rem;
+  color: var(--cor-texto-fraco);
+}
+
+.badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: var(--esp-1) var(--esp-2);
+  border-radius: 999px;
+  background: var(--cor-superficie-2);
+  border: 1px solid var(--cor-borda);
+  color: var(--cor-texto-fraco);
+}
+
+.badge--admin {
+  color: var(--cor-primaria);
+  border-color: var(--cor-primaria);
+}
+
+.logout {
+  padding: var(--esp-2) var(--esp-3);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  background: transparent;
+  color: var(--cor-texto);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.logout:hover {
+  border-color: var(--cor-primaria);
+}
+
+.content {
+  padding: var(--esp-6);
+}

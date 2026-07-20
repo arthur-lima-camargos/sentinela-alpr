@@ -1,0 +1,126 @@
+<section class="page">
+  <header class="page__head">
+    <div>
+      <h1>Câmeras</h1>
+      <p class="page__sub">{{ totalElements() }} câmera(s) cadastrada(s)</p>
+    </div>
+    @if (isAdmin()) {
+      <button class="btn btn--primary" type="button" (click)="openCreate()">Nova câmera</button>
+    }
+  </header>
+
+  @if (loading()) {
+    <div class="state" role="status">Carregando…</div>
+  } @else if (error()) {
+    <div class="state state--error" role="alert">
+      {{ error() }}
+      <button class="btn" type="button" (click)="load(page())">Tentar de novo</button>
+    </div>
+  } @else if (cameras().length === 0) {
+    <div class="state">
+      Nenhuma câmera cadastrada.
+      @if (isAdmin()) { Clique em <strong>Nova câmera</strong> para começar. }
+    </div>
+  } @else {
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Rodovia</th>
+            <th>Coordenadas</th>
+            <th>Status</th>
+            <th>Criada em</th>
+            @if (isAdmin()) { <th class="table__actions">Ações</th> }
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of cameras(); track c.id) {
+            <tr [class.row--inactive]="!c.active">
+              <td>{{ c.name }}</td>
+              <td>{{ c.road || '—' }}</td>
+              <td class="mono">
+                @if (c.latitude !== null && c.longitude !== null) {
+                  {{ c.latitude }}, {{ c.longitude }}
+                } @else { — }
+              </td>
+              <td>
+                <span class="badge" [class.badge--ok]="c.active" [class.badge--off]="!c.active">
+                  {{ c.active ? 'Ativa' : 'Inativa' }}
+                </span>
+              </td>
+              <td>{{ c.createdAt | date: 'short' }}</td>
+              @if (isAdmin()) {
+                <td class="table__actions">
+                  <button class="btn btn--sm" type="button" (click)="openEdit(c)">Editar</button>
+                  @if (c.active) {
+                    <button class="btn btn--sm btn--danger" type="button" (click)="deactivate(c)">Desativar</button>
+                  } @else {
+                    <button class="btn btn--sm" type="button" (click)="activate(c)">Reativar</button>
+                  }
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <footer class="pager">
+      <button class="btn btn--sm" type="button" [disabled]="page() === 0" (click)="prev()">Anterior</button>
+      <span class="pager__info">Página {{ page() + 1 }} de {{ totalPages() }}</span>
+      <button class="btn btn--sm" type="button" [disabled]="page() + 1 >= totalPages()" (click)="next()">Próxima</button>
+    </footer>
+  }
+</section>
+
+@if (formOpen()) {
+  <div class="overlay" (click)="closeForm()">
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-title" (click)="$event.stopPropagation()">
+      <h2 id="dlg-title">{{ editingId() === null ? 'Nova câmera' : 'Editar câmera' }}</h2>
+
+      <form [formGroup]="form" (ngSubmit)="save()" class="form">
+        <label class="field">
+          <span class="field__label">Nome *</span>
+          <input class="field__input" type="text" formControlName="name" maxlength="120" autocomplete="off" />
+          @if (form.controls.name.touched && form.controls.name.invalid) {
+            <span class="field__error">Nome é obrigatório (até 120 caracteres).</span>
+          }
+        </label>
+
+        <div class="field-row">
+          <label class="field">
+            <span class="field__label">Latitude</span>
+            <input class="field__input" type="number" step="0.000001" formControlName="latitude" />
+            @if (form.controls.latitude.touched && form.controls.latitude.invalid) {
+              <span class="field__error">Entre −90 e 90.</span>
+            }
+          </label>
+          <label class="field">
+            <span class="field__label">Longitude</span>
+            <input class="field__input" type="number" step="0.000001" formControlName="longitude" />
+            @if (form.controls.longitude.touched && form.controls.longitude.invalid) {
+              <span class="field__error">Entre −180 e 180.</span>
+            }
+          </label>
+        </div>
+
+        <label class="field">
+          <span class="field__label">Rodovia</span>
+          <input class="field__input" type="text" formControlName="road" maxlength="120" autocomplete="off" />
+        </label>
+
+        @if (formError()) {
+          <div class="state state--error" role="alert">{{ formError() }}</div>
+        }
+
+        <div class="form__actions">
+          <button class="btn" type="button" (click)="closeForm()">Cancelar</button>
+          <button class="btn btn--primary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Salvando…' : 'Salvar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

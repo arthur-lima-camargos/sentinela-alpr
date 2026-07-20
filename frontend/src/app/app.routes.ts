@@ -12,7 +12,19 @@ export const routes: Routes = [
     path: '',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./features/home/home.component').then((m) => m.HomeComponent),
+      import('./shared/shell/shell.component').then((m) => m.ShellComponent),
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/home/home.component').then((m) => m.HomeComponent),
+      },
+      {
+        path: 'cameras',
+        loadComponent: () =>
+          import('./features/cameras/cameras.component').then((m) => m.CamerasComponent),
+      },
+    ],
   },
   { path: '**', redirectTo: '' },
 ];

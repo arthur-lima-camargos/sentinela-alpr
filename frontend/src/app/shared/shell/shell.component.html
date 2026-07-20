@@ -1,0 +1,24 @@
+<header class="topbar">
+  <div class="topbar__brand">
+    <span class="topbar__mark" aria-hidden="true">◈</span>
+    <span>Sentinela <strong>ALPR</strong></span>
+  </div>
+
+  <nav class="nav" aria-label="Navegação principal">
+    <a routerLink="/" routerLinkActive="nav__link--active" [routerLinkActiveOptions]="{ exact: true }"
+       class="nav__link">Painel</a>
+    <a routerLink="/cameras" routerLinkActive="nav__link--active" class="nav__link">Câmeras</a>
+  </nav>
+
+  @if (user(); as u) {
+    <div class="topbar__user">
+      <span class="topbar__login">{{ u.login }}</span>
+      <span class="badge" [class.badge--admin]="u.role === 'ADMIN'">{{ u.role }}</span>
+      <button class="logout" type="button" (click)="logout()">Sair</button>
+    </div>
+  }
+</header>
+
+<main class="content">
+  <router-outlet />
+</main>

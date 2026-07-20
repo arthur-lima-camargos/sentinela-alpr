@@ -1,6 +1,4 @@
-import { Component, inject } from '@angular/core';
-
-import { AuthService } from '../../core/auth/auth.service';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-home',
@@ -8,12 +6,4 @@ import { AuthService } from '../../core/auth/auth.service';
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
-export class HomeComponent {
-  private readonly auth = inject(AuthService);
-
-  protected readonly user = this.auth.currentUser;
-
-  protected logout(): void {
-    this.auth.logout();
-  }
-}
+export class HomeComponent {}

@@ -1,24 +1,7 @@
-<header class="topbar">
-  <div class="topbar__brand">
-    <span class="topbar__mark" aria-hidden="true">◈</span>
-    <span>Sentinela <strong>ALPR</strong></span>
-  </div>
-
-  @if (user(); as u) {
-    <div class="topbar__user">
-      <span class="topbar__login">{{ u.login }}</span>
-      <span class="badge" [class.badge--admin]="u.role === 'ADMIN'">{{ u.role }}</span>
-      <button class="logout" type="button" (click)="logout()">Sair</button>
-    </div>
-  }
-</header>
-
-<main class="content">
-  <section class="panel">
-    <h1>Painel</h1>
-    <p>
-      Você está autenticado. As telas de câmeras, passagens, watchlist e alertas
-      serão adicionadas nas próximas fases.
-    </p>
-  </section>
-</main>
+<section class="panel">
+  <h1>Painel</h1>
+  <p>
+    Você está autenticado. Use a navegação acima para gerenciar câmeras. As telas
+    de passagens, watchlist e alertas serão adicionadas nas próximas fases.
+  </p>
+</section>
