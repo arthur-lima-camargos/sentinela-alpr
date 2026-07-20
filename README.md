@@ -166,9 +166,15 @@ tentativa, sobrevivendo a refresh), reconecta sozinho e assina `/topic/alerts`. 
 `AlertRealtimeService` vive no **shell** (app-wide): um **sino com contador** no
 topbar acende ao chegar alerta (sempre visível), e a própria tela **insere o alerta
 no topo ao vivo**, com destaque que esmaece. O motivo do alerta (Roubo/Furto…) é
-resolvido pela watchlist. Proxy de dev `/ws` (`ws: true`); ADR-029. Cobertura
-ampliada: **53** testes de integração no backend e **56** no frontend (Vitest); a
-conexão STOMP em si é verificada em runtime.
+resolvido pela watchlist. Proxy de dev `/ws` (`ws: true`); ADR-029.
+
+**Frontend — gestão de API keys (concluído):** dentro da tela de câmeras, um **modal
+"Chaves"** por câmera (ADMIN) que **lista** as chaves (prefixo, status, datas),
+**emite** uma nova exibindo o **segredo uma única vez** (com aviso e botão copiar) e
+**revoga** as ativas — consumindo `POST/GET/DELETE /api/v1/cameras/{id}/api-keys`.
+Fecha o ciclo de uso: uma câmera cadastrada agora recebe sua chave pela própria UI.
+Cobertura ampliada: **53** testes de integração no backend e **62** no frontend
+(Vitest); a conexão STOMP em si é verificada em runtime.
 
 **Desempenho — Fase 5 (benchmark concluído; carga adiada):** conduzido um
 **benchmark comparativo com/sem índice** sobre 10M passagens, medindo leitura,
@@ -184,8 +190,8 @@ simulador de câmeras.
 O backend expõe a **API REST completa do MVP** (auth, câmeras + API keys, passagens,
 watchlist, alertas) e o **broadcast de alertas em tempo real** (STOMP
 `/topic/alerts`), tudo coberto por **53 testes de integração**. O foco agora é o
-**frontend consumindo esses recursos** — login, câmeras, watchlist, passagens e
-alertas (com tempo real) já prontos; faltam a gestão de API keys e o painel inicial.
+**frontend consumindo esses recursos** — login, câmeras (com gestão de API keys),
+watchlist, passagens e alertas (com tempo real) já prontos; falta o painel inicial.
 
 **Cobertura da API pelo frontend:**
 
@@ -193,7 +199,7 @@ alertas (com tempo real) já prontos; faltam a gestão de API keys e o painel in
 |-----------------------------------------------|:-------:|:----:|
 | Autenticação (login / refresh)                |   ✅    |  ✅  |
 | Câmeras (CRUD)                                 |   ✅    |  ✅  |
-| API keys por câmera (emitir / listar / revogar) | ✅    |  ⚪  |
+| API keys por câmera (emitir / listar / revogar) | ✅    |  ✅  |
 | Passagens (consulta por keyset + filtros)      |   ✅    |  ✅  |
 | Watchlist (CRUD + reclassificação)             |   ✅    |  ✅  |
 | Alertas (listar / filtrar + mudar status)      |   ✅    |  ✅  |
@@ -202,5 +208,5 @@ alertas (com tempo real) já prontos; faltam a gestão de API keys e o painel in
 > A ingestão de passagens (`POST /api/v1/detections`) é consumida pela **câmera**
 > (via API key), não pela UI — por isso não tem tela.
 
-**Próximas telas:** gestão de **API keys** dentro da tela de câmeras e um **painel**
-(`home`) real com métricas — hoje a home é apenas um placeholder.
+**Próxima tela:** um **painel** (`home`) real com métricas — hoje a home é apenas um
+placeholder.

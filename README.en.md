@@ -166,8 +166,15 @@ attempt, surviving refresh), auto-reconnects and subscribes to `/topic/alerts`. 
 the topbar lights up when an alert arrives (always visible), and the screen itself
 **prepends the alert live**, with a fading highlight. The alert reason
 (Robbery/Theft…) is resolved from the watchlist. Dev proxy `/ws` (`ws: true`);
-ADR-029. Coverage expanded: **53** backend integration tests and **56** on the
-frontend (Vitest); the STOMP connection itself is verified at runtime.
+ADR-029.
+
+**Frontend — API key management (done):** inside the cameras screen, a **"Keys"
+modal** per camera (ADMIN) that **lists** the keys (prefix, status, dates), **issues**
+a new one showing the **secret once** (with a warning and copy button) and **revokes**
+active ones — consuming `POST/GET/DELETE /api/v1/cameras/{id}/api-keys`. It closes the
+usage loop: a registered camera now gets its key through the UI itself. Coverage
+expanded: **53** backend integration tests and **62** on the frontend (Vitest); the
+STOMP connection itself is verified at runtime.
 
 **Performance — Phase 5 (benchmark done; load testing deferred):** an **A/B
 benchmark with vs without indexes** over 10M detections, measuring reads, writes and
@@ -183,9 +190,9 @@ camera simulator.
 The backend exposes the **complete MVP REST API** (auth, cameras + API keys,
 detections, watchlist, alerts) and the **real-time alert broadcast** (STOMP
 `/topic/alerts`), all covered by **53 integration tests**. The focus now is the
-**frontend consuming those resources** — login, cameras, watchlist, detections and
-alerts (with real time) are already done; API key management and the initial panel
-remain.
+**frontend consuming those resources** — login, cameras (with API key management),
+watchlist, detections and alerts (with real time) are already done; the initial panel
+remains.
 
 **API coverage by the frontend:**
 
@@ -193,7 +200,7 @@ remain.
 |------------------------------------------------|:-------:|:------:|
 | Authentication (login / refresh)               |   ✅    |   ✅   |
 | Cameras (CRUD)                                  |   ✅    |   ✅   |
-| Per-camera API keys (issue / list / revoke)     |  ✅    |   ⚪   |
+| Per-camera API keys (issue / list / revoke)     |  ✅    |   ✅   |
 | Detections (keyset query + filters)            |   ✅    |   ✅   |
 | Watchlist (CRUD + reclassification)            |   ✅    |   ✅   |
 | Alerts (list / filter + status change)         |   ✅    |   ✅   |
@@ -202,5 +209,5 @@ remain.
 > Detection ingestion (`POST /api/v1/detections`) is consumed by the **camera**
 > (via API key), not by the UI — hence no screen.
 
-**Next screens:** **API key** management inside the cameras screen, and a real
-**panel** (`home`) with metrics — today the home is just a placeholder.
+**Next screen:** a real **panel** (`home`) with metrics — today the home is just a
+placeholder.
