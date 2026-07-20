@@ -1,0 +1,83 @@
+<section class="page">
+  <header class="page__head">
+    <div>
+      <h1>Passagens</h1>
+      <p class="page__sub">{{ items().length }} passagem(ns) carregada(s){{ hasMore() ? '+' : '' }}</p>
+    </div>
+  </header>
+
+  <form class="filters" [formGroup]="form" (ngSubmit)="search()">
+    <label class="field">
+      <span class="field__label">Placa</span>
+      <input class="field__input mono" type="text" formControlName="plate" maxlength="8"
+             autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="ABC1D34" />
+    </label>
+
+    <label class="field">
+      <span class="field__label">Câmera</span>
+      <select class="field__input" formControlName="cameraId">
+        <option [ngValue]="null">Todas</option>
+        @for (c of cameras(); track c.id) {
+          <option [ngValue]="c.id">{{ c.name }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="field">
+      <span class="field__label">De</span>
+      <input class="field__input" type="datetime-local" formControlName="from" />
+    </label>
+
+    <label class="field">
+      <span class="field__label">Até</span>
+      <input class="field__input" type="datetime-local" formControlName="to" />
+    </label>
+
+    <div class="filters__actions">
+      <button class="btn btn--primary" type="submit" [disabled]="loading()">Buscar</button>
+      <button class="btn" type="button" (click)="clear()" [disabled]="loading()">Limpar</button>
+    </div>
+  </form>
+
+  @if (loading()) {
+    <div class="state" role="status">Carregando…</div>
+  } @else if (error()) {
+    <div class="state state--error" role="alert">
+      {{ error() }}
+      <button class="btn" type="button" (click)="search()">Tentar de novo</button>
+    </div>
+  } @else if (items().length === 0) {
+    <div class="state">Nenhuma passagem encontrada para os filtros informados.</div>
+  } @else {
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Placa</th>
+            <th>Câmera</th>
+            <th>Data/hora</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (d of items(); track d.id) {
+            <tr>
+              <td class="mono">{{ d.plate }}</td>
+              <td>{{ cameraName(d.cameraId) }}</td>
+              <td>{{ d.detectedAt | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <footer class="loadmore">
+      @if (hasMore()) {
+        <button class="btn" type="button" (click)="loadMore()" [disabled]="loadingMore()">
+          {{ loadingMore() ? 'Carregando…' : 'Carregar mais' }}
+        </button>
+      } @else {
+        <span class="loadmore__end">Fim dos resultados.</span>
+      }
+    </footer>
+  }
+</section>

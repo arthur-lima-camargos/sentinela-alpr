@@ -147,9 +147,16 @@ motivo** (`PUT /api/v1/watchlist/{id}`, só o `reason` — a placa é imutável)
 restrito a ADMIN (ADR-028). A tela valida a placa no cliente (mesmo formato
 Mercosul/antigo do backend), exibe o motivo (Roubo/Furto/Procurado/Suspeito) e o
 status, com placas em fonte monoespaçada. Estilos comuns das telas de dados
-extraídos para um parcial SCSS compartilhado. Cobertura ampliada: **53** testes de
-integração no backend e **32** no frontend (Vitest), incluindo autorização por
-perfil (403/401).
+extraídos para um parcial SCSS compartilhado.
+
+**Frontend — passagens (concluído):** a tela de leitura central. Consome
+`GET /api/v1/detections` com **paginação por cursor (keyset)** — botão **"Carregar
+mais"** que anexa a próxima leva (o cursor é forward-only). Filtros de **placa**
+(busca exata, normalizada no cliente), **câmera** (dropdown), e **período** (de/até
+via `datetime-local`, convertidos para `Instant` UTC). O `cameraId` da passagem é
+resolvido para o **nome da câmera** buscando a lista de câmeras uma vez. Somente
+leitura (qualquer perfil). Cobertura ampliada: **53** testes de integração no backend
+e **43** no frontend (Vitest), incluindo autorização por perfil (403/401).
 
 **Desempenho — Fase 5 (benchmark concluído; carga adiada):** conduzido um
 **benchmark comparativo com/sem índice** sobre 10M passagens, medindo leitura,
@@ -174,7 +181,7 @@ watchlist, alertas) e o **broadcast de alertas em tempo real** (STOMP
 | Autenticação (login / refresh)                |   ✅    |  ✅  |
 | Câmeras (CRUD)                                 |   ✅    |  ✅  |
 | API keys por câmera (emitir / listar / revogar) | ✅    |  ⚪  |
-| Passagens (consulta por keyset + filtros)      |   ✅    |  ⚪  |
+| Passagens (consulta por keyset + filtros)      |   ✅    |  ✅  |
 | Watchlist (CRUD + reclassificação)             |   ✅    |  ✅  |
 | Alertas (listar / filtrar + mudar status)      |   ✅    |  ⚪  |
 | Alertas em tempo real (`/topic/alerts`)        |   ✅    |  ⚪  |
@@ -182,7 +189,6 @@ watchlist, alertas) e o **broadcast de alertas em tempo real** (STOMP
 > A ingestão de passagens (`POST /api/v1/detections`) é consumida pela **câmera**
 > (via API key), não pela UI — por isso não tem tela.
 
-**Próximas telas:** passagens (histórico com filtros e paginação por **cursor**),
-alertas (triagem) + **cliente WebSocket/STOMP** para alertas ao vivo, gestão de
-**API keys** dentro da tela de câmeras, e um **painel** (`home`) real com métricas —
-hoje a home é apenas um placeholder.
+**Próximas telas:** alertas (triagem) + **cliente WebSocket/STOMP** para alertas ao
+vivo, gestão de **API keys** dentro da tela de câmeras, e um **painel** (`home`) real
+com métricas — hoje a home é apenas um placeholder.

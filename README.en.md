@@ -146,7 +146,15 @@ a **reversible soft-delete** (`DELETE` now sets `active=false`), **reactivation*
 to ADMIN (ADR-028). The screen validates the plate on the client (same Mercosur/old
 format as the backend), shows the reason (Robbery/Theft/Wanted/Suspect) and status,
 with plates in a monospace font. Common data-screen styles were extracted into a
-shared SCSS partial. Coverage expanded: **53** backend integration tests and **32**
+shared SCSS partial.
+
+**Frontend — detections (done):** the central read screen. It consumes
+`GET /api/v1/detections` with **cursor (keyset) pagination** — a **"Load more"**
+button that appends the next batch (the cursor is forward-only). Filters for **plate**
+(exact match, normalized on the client), **camera** (dropdown), and **time range**
+(from/to via `datetime-local`, converted to a UTC `Instant`). Each detection's
+`cameraId` is resolved to the **camera name** by fetching the camera list once.
+Read-only (any role). Coverage expanded: **53** backend integration tests and **43**
 on the frontend (Vitest), including role authorization (403/401).
 
 **Performance — Phase 5 (benchmark done; load testing deferred):** an **A/B
@@ -173,7 +181,7 @@ done.
 | Authentication (login / refresh)               |   ✅    |   ✅   |
 | Cameras (CRUD)                                  |   ✅    |   ✅   |
 | Per-camera API keys (issue / list / revoke)     |  ✅    |   ⚪   |
-| Detections (keyset query + filters)            |   ✅    |   ⚪   |
+| Detections (keyset query + filters)            |   ✅    |   ✅   |
 | Watchlist (CRUD + reclassification)            |   ✅    |   ✅   |
 | Alerts (list / filter + status change)         |   ✅    |   ⚪   |
 | Real-time alerts (`/topic/alerts`)             |   ✅    |   ⚪   |
@@ -181,7 +189,6 @@ done.
 > Detection ingestion (`POST /api/v1/detections`) is consumed by the **camera**
 > (via API key), not by the UI — hence no screen.
 
-**Next screens:** detections (history with filters and **cursor** pagination),
-alerts (triage) + a **WebSocket/STOMP client** for live alerts, **API key**
-management inside the cameras screen, and a real **panel** (`home`) with metrics —
-today the home is just a placeholder.
+**Next screens:** alerts (triage) + a **WebSocket/STOMP client** for live alerts,
+**API key** management inside the cameras screen, and a real **panel** (`home`) with
+metrics — today the home is just a placeholder.

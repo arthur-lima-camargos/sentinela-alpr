@@ -11,11 +11,7 @@ export function watchReasonLabel(reason: WatchReason): string {
   return WATCH_REASONS.find((r) => r.value === reason)?.label ?? reason;
 }
 
-export const PLATE_REGEX = /^[A-Z]{3}[0-9][0-9A-Z][0-9]{2}$/;
-
-export function normalizePlate(raw: string): string {
-  return raw.trim().replace(/[-\s]/g, '').toUpperCase();
-}
+export { PLATE_REGEX, normalizePlate } from './plate';
 
 export interface WatchedVehicle {
   id: number;
