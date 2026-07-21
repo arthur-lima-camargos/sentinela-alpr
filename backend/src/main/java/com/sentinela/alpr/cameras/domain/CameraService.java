@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sentinela.alpr.cameras.api.CameraRequest;
 import com.sentinela.alpr.cameras.api.CameraResponse;
+import com.sentinela.alpr.cameras.api.CameraSummaryResponse;
 import com.sentinela.alpr.cameras.infra.CameraRepository;
 import com.sentinela.alpr.shared.error.NotFoundException;
 
@@ -45,6 +46,11 @@ public class CameraService {
 	@Transactional(readOnly = true)
 	public Page<CameraResponse> list(Pageable pageable) {
 		return repository.findAll(pageable).map(CameraService::toResponse);
+	}
+
+	@Transactional(readOnly = true)
+	public CameraSummaryResponse summary() {
+		return new CameraSummaryResponse(repository.countByActiveTrue(), repository.countByActiveFalse());
 	}
 
 	@Transactional

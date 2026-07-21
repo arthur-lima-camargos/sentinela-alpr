@@ -11,5 +11,7 @@ public interface AlertRepository extends JpaRepository<Alert, Long> {
 
 	Page<Alert> findByStatus(AlertStatus status, Pageable pageable);
 
+	long countByStatus(AlertStatus status);
+
 	boolean existsByDetectionId(Long detectionId);
 }

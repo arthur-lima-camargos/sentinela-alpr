@@ -45,7 +45,7 @@ consulta o histórico e dispara **alertas** quando uma placa monitorada é vista
 | 3 | Domínio (API REST)          | ✅ Concluído    |
 | 4 | Segurança (JWT)             | ✅ Concluído    |
 | 5 | Desempenho (benchmark)      | 🟡 Parcial      |
-| 6 | Frontend — telas de consumo | 🟡 Em andamento |
+| 6 | Frontend — telas de consumo | ✅ Concluído    |
 
 **Legenda:** ✅ concluído · 🟡 em andamento/parcial · ⚪ pendente
 
@@ -173,8 +173,18 @@ resolvido pela watchlist. Proxy de dev `/ws` (`ws: true`); ADR-029.
 **emite** uma nova exibindo o **segredo uma única vez** (com aviso e botão copiar) e
 **revoga** as ativas — consumindo `POST/GET/DELETE /api/v1/cameras/{id}/api-keys`.
 Fecha o ciclo de uso: uma câmera cadastrada agora recebe sua chave pela própria UI.
-Cobertura ampliada: **53** testes de integração no backend e **62** no frontend
+Cobertura ampliada: testes de integração no backend e no frontend
 (Vitest); a conexão STOMP em si é verificada em runtime.
+
+**Frontend — painel inicial (concluído):** a última tela da fase. A `home` deixou de
+ser placeholder e virou um **painel de métricas** com quatro cartões: **alertas
+pendentes** (NEW, com destaque de urgência quando > 0), **passagens** (últimas 24h /
+última hora), **câmeras** (ativas / inativas) e **veículos monitorados** (ativos). Cada
+cartão é um atalho para a respectiva tela, e o de alertas **incrementa ao vivo** quando
+chega um alerta pelo STOMP. As métricas vêm de **endpoints de agregação por módulo**
+(`GET /api/v1/{alerts,detections,cameras,watchlist}/summary`), carregados em paralelo;
+as contagens de passagens usam **janelas móveis** (24h/1h) sobre `detected_at`. Com isso
+a **Fase 6 está concluída**: **61** testes de integração no backend e **67** no frontend.
 
 **Desempenho — Fase 5 (benchmark concluído; carga adiada):** conduzido um
 **benchmark comparativo com/sem índice** sobre 10M passagens, medindo leitura,
@@ -189,9 +199,9 @@ simulador de câmeras.
 
 O backend expõe a **API REST completa do MVP** (auth, câmeras + API keys, passagens,
 watchlist, alertas) e o **broadcast de alertas em tempo real** (STOMP
-`/topic/alerts`), tudo coberto por **53 testes de integração**. O foco agora é o
-**frontend consumindo esses recursos** — login, câmeras (com gestão de API keys),
-watchlist, passagens e alertas (com tempo real) já prontos; falta o painel inicial.
+`/topic/alerts`), tudo coberto por **61 testes de integração**. O **frontend consome
+todos esses recursos** — login, câmeras (com gestão de API keys), watchlist, passagens,
+alertas (com tempo real) e o **painel inicial com métricas** — encerrando a Fase 6.
 
 **Cobertura da API pelo frontend:**
 
@@ -204,9 +214,10 @@ watchlist, passagens e alertas (com tempo real) já prontos; falta o painel inic
 | Watchlist (CRUD + reclassificação)             |   ✅    |  ✅  |
 | Alertas (listar / filtrar + mudar status)      |   ✅    |  ✅  |
 | Alertas em tempo real (`/topic/alerts`)        |   ✅    |  ✅  |
+| Painel inicial (métricas via `/summary`)       |   ✅    |  ✅  |
 
 > A ingestão de passagens (`POST /api/v1/detections`) é consumida pela **câmera**
 > (via API key), não pela UI — por isso não tem tela.
 
-**Próxima tela:** um **painel** (`home`) real com métricas — hoje a home é apenas um
-placeholder.
+**Fase 6 concluída.** Próximos passos opcionais: retomar itens adiados da Fase 5
+(carga com k6, simulador de câmeras, testes de concorrência).

@@ -1,7 +1,73 @@
-<section class="panel">
-  <h1>Painel</h1>
-  <p>
-    Você está autenticado. Use a navegação acima para gerenciar câmeras. As telas
-    de passagens, watchlist e alertas serão adicionadas nas próximas fases.
-  </p>
-</section>
+<header class="page__head">
+  <div>
+    <h1>Painel</h1>
+    <p class="page__sub">Visão geral do monitoramento.</p>
+  </div>
+  <div class="acoes">
+    <span class="tempo-real" [class.tempo-real--on]="connected()">
+      <span class="tempo-real__ponto" aria-hidden="true"></span>
+      {{ connected() ? 'Ao vivo' : 'Offline' }}
+    </span>
+    <button type="button" class="btn" (click)="load()" [disabled]="loading()">
+      {{ loading() ? 'Atualizando…' : 'Atualizar' }}
+    </button>
+  </div>
+</header>
+
+@if (error()) {
+  <div class="estado-erro" role="alert">
+    <p>{{ error() }}</p>
+    <button type="button" class="btn btn--primary" (click)="load()">Tentar de novo</button>
+  </div>
+} @else if (loading() && !alertSummary()) {
+  <div class="grade" aria-hidden="true">
+    @for (i of skeleton; track i) {
+      <div class="cartao cartao--skeleton"></div>
+    }
+  </div>
+} @else {
+  <div class="grade">
+    <a routerLink="/alerts" class="cartao cartao--link" [class.cartao--critico]="pendingAlerts() > 0">
+      <div class="cartao__topo">
+        <span class="cartao__rotulo">Alertas pendentes</span>
+        <span class="cartao__icone" aria-hidden="true">{{ pendingAlerts() > 0 ? '⚠' : '✓' }}</span>
+      </div>
+      <span class="cartao__numero" role="status" aria-live="polite">{{ pendingAlerts() }}</span>
+      <span class="cartao__detalhe">
+        @if (pendingAlerts() > 0) {
+          <strong class="cartao__marca">Requer triagem</strong> ·
+        }
+        {{ alertSummary()?.seenCount ?? 0 }} já tratados
+      </span>
+    </a>
+
+    <a routerLink="/detections" class="cartao cartao--link">
+      <div class="cartao__topo">
+        <span class="cartao__rotulo">Passagens (24h)</span>
+        <span class="cartao__icone" aria-hidden="true">🚗</span>
+      </div>
+      <span class="cartao__numero">{{ detectionSummary()?.last24h ?? 0 }}</span>
+      <span class="cartao__detalhe">{{ detectionSummary()?.lastHour ?? 0 }} na última hora</span>
+    </a>
+
+    <a routerLink="/cameras" class="cartao cartao--link">
+      <div class="cartao__topo">
+        <span class="cartao__rotulo">Câmeras ativas</span>
+        <span class="cartao__icone" aria-hidden="true">📷</span>
+      </div>
+      <span class="cartao__numero">{{ cameraSummary()?.active ?? 0 }}</span>
+      <span class="cartao__detalhe" [class.cartao__detalhe--atencao]="(cameraSummary()?.inactive ?? 0) > 0">
+        {{ cameraSummary()?.inactive ?? 0 }} inativas
+      </span>
+    </a>
+
+    <a routerLink="/watchlist" class="cartao cartao--link">
+      <div class="cartao__topo">
+        <span class="cartao__rotulo">Veículos monitorados</span>
+        <span class="cartao__icone" aria-hidden="true">🎯</span>
+      </div>
+      <span class="cartao__numero">{{ watchlistSummary()?.active ?? 0 }}</span>
+      <span class="cartao__detalhe">na watchlist ativa</span>
+    </a>
+  </div>
+}

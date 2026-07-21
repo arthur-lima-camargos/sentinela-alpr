@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sentinela.alpr.alerts.api.AlertResponse;
+import com.sentinela.alpr.alerts.api.AlertSummaryResponse;
 import com.sentinela.alpr.alerts.infra.AlertRepository;
 import com.sentinela.alpr.detections.domain.DetectionRecordedEvent;
 import com.sentinela.alpr.shared.error.NotFoundException;
@@ -38,6 +39,13 @@ public class AlertService {
 				? repository.findAll(pageable)
 				: repository.findByStatus(status, pageable);
 		return page.map(AlertService::toResponse);
+	}
+
+	@Transactional(readOnly = true)
+	public AlertSummaryResponse summary() {
+		return new AlertSummaryResponse(
+				repository.countByStatus(AlertStatus.NEW),
+				repository.countByStatus(AlertStatus.SEEN));
 	}
 
 	@Transactional

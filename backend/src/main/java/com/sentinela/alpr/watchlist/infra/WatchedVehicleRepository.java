@@ -10,5 +10,7 @@ public interface WatchedVehicleRepository extends JpaRepository<WatchedVehicle, 
 
 	Optional<WatchedVehicle> findByPlateAndActiveTrue(String plate);
 
+	long countByActiveTrue();
+
 	boolean existsByPlate(String plate);
 }

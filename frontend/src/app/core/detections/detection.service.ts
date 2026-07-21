@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { DetectionPage, DetectionQuery } from '../../shared/models/detection.model';
+import { DetectionPage, DetectionQuery, DetectionSummary } from '../../shared/models/detection.model';
 
 @Injectable({ providedIn: 'root' })
 export class DetectionService {
@@ -30,5 +30,9 @@ export class DetectionService {
       params = params.set('size', q.size);
     }
     return this.http.get<DetectionPage>(this.base, { params });
+  }
+
+  summary(): Observable<DetectionSummary> {
+    return this.http.get<DetectionSummary>(`${this.base}/summary`);
   }
 }

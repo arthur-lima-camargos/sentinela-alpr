@@ -45,7 +45,7 @@ queries the history, and raises **alerts** when a monitored plate is seen.
 | 3 | Domain (REST API)           | ✅ Done          |
 | 4 | Security (JWT)              | ✅ Done          |
 | 5 | Performance (benchmark)     | 🟡 Partial      |
-| 6 | Frontend — API screens      | 🟡 In progress  |
+| 6 | Frontend — API screens      | ✅ Done         |
 
 **Legend:** ✅ done · 🟡 in progress/partial · ⚪ pending
 
@@ -173,8 +173,18 @@ modal** per camera (ADMIN) that **lists** the keys (prefix, status, dates), **is
 a new one showing the **secret once** (with a warning and copy button) and **revokes**
 active ones — consuming `POST/GET/DELETE /api/v1/cameras/{id}/api-keys`. It closes the
 usage loop: a registered camera now gets its key through the UI itself. Coverage
-expanded: **53** backend integration tests and **62** on the frontend (Vitest); the
-STOMP connection itself is verified at runtime.
+expanded across backend and frontend (Vitest); the STOMP connection itself is verified
+at runtime.
+
+**Frontend — home dashboard (done):** the phase's last screen. The `home` is no longer
+a placeholder and became a **metrics panel** with four cards: **pending alerts** (NEW,
+highlighted as urgent when > 0), **detections** (last 24h / last hour), **cameras**
+(active / inactive) and **watched vehicles** (active). Each card links to its screen,
+and the alerts card **increments live** when an alert arrives over STOMP. The metrics
+come from **per-module aggregation endpoints**
+(`GET /api/v1/{alerts,detections,cameras,watchlist}/summary`), loaded in parallel;
+detection counts use **rolling windows** (24h/1h) over `detected_at`. With this,
+**Phase 6 is done**: **61** backend integration tests and **67** on the frontend.
 
 **Performance — Phase 5 (benchmark done; load testing deferred):** an **A/B
 benchmark with vs without indexes** over 10M detections, measuring reads, writes and
@@ -189,10 +199,9 @@ camera simulator.
 
 The backend exposes the **complete MVP REST API** (auth, cameras + API keys,
 detections, watchlist, alerts) and the **real-time alert broadcast** (STOMP
-`/topic/alerts`), all covered by **53 integration tests**. The focus now is the
-**frontend consuming those resources** — login, cameras (with API key management),
-watchlist, detections and alerts (with real time) are already done; the initial panel
-remains.
+`/topic/alerts`), all covered by **61 integration tests**. The **frontend consumes all
+those resources** — login, cameras (with API key management), watchlist, detections,
+alerts (with real time) and the **home dashboard with metrics** — closing Phase 6.
 
 **API coverage by the frontend:**
 
@@ -205,9 +214,10 @@ remains.
 | Watchlist (CRUD + reclassification)            |   ✅    |   ✅   |
 | Alerts (list / filter + status change)         |   ✅    |   ✅   |
 | Real-time alerts (`/topic/alerts`)             |   ✅    |   ✅   |
+| Home dashboard (metrics via `/summary`)        |   ✅    |   ✅   |
 
 > Detection ingestion (`POST /api/v1/detections`) is consumed by the **camera**
 > (via API key), not by the UI — hence no screen.
 
-**Next screen:** a real **panel** (`home`) with metrics — today the home is just a
-placeholder.
+**Phase 6 done.** Optional next steps: pick up the deferred Phase 5 items (k6 load
+testing, camera simulator, concurrency tests).

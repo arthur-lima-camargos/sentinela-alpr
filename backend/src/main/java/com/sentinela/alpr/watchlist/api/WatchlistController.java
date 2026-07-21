@@ -52,6 +52,11 @@ class WatchlistController {
 		return service.list(pageable);
 	}
 
+	@GetMapping("/summary")
+	WatchlistSummaryResponse summary() {
+		return service.summary();
+	}
+
 	@DeleteMapping("/{id}")
 	ResponseEntity<Void> deactivate(@PathVariable Long id) {
 		service.deactivate(id);

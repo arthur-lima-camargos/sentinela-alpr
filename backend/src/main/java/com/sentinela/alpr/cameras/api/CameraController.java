@@ -52,6 +52,11 @@ class CameraController {
 		return service.list(pageable);
 	}
 
+	@GetMapping("/summary")
+	CameraSummaryResponse summary() {
+		return service.summary();
+	}
+
 	@DeleteMapping("/{id}")
 	ResponseEntity<Void> deactivate(@PathVariable Long id) {
 		service.deactivate(id);

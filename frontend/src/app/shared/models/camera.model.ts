@@ -15,4 +15,9 @@ export interface CameraRequest {
   road: string | null;
 }
 
+export interface CameraSummary {
+  active: number;
+  inactive: number;
+}
+
 export type { Page } from './page.model';

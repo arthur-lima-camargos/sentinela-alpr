@@ -6,6 +6,7 @@ import { Page } from '../../shared/models/page.model';
 import {
   WatchedVehicle,
   WatchlistRequest,
+  WatchlistSummary,
   WatchlistUpdateRequest,
 } from '../../shared/models/watchlist.model';
 
@@ -33,5 +34,9 @@ export class WatchlistService {
 
   activate(id: number): Observable<void> {
     return this.http.post<void>(`${this.base}/${id}/activate`, {});
+  }
+
+  summary(): Observable<WatchlistSummary> {
+    return this.http.get<WatchlistSummary>(`${this.base}/summary`);
   }
 }

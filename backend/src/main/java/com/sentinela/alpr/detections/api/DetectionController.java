@@ -45,4 +45,9 @@ class DetectionController {
 			@RequestParam(required = false) Integer size) {
 		return service.query(plate, cameraId, from, to, cursor, size);
 	}
+
+	@GetMapping("/summary")
+	DetectionSummaryResponse summary() {
+		return service.summary();
+	}
 }

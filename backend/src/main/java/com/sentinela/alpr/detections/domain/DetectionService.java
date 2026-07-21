@@ -1,5 +1,6 @@
 package com.sentinela.alpr.detections.domain;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sentinela.alpr.detections.api.DetectionPage;
 import com.sentinela.alpr.detections.api.DetectionRequest;
 import com.sentinela.alpr.detections.api.DetectionResponse;
+import com.sentinela.alpr.detections.api.DetectionSummaryResponse;
 import com.sentinela.alpr.detections.infra.DetectionRepository;
 import com.sentinela.alpr.shared.error.BusinessRuleException;
 import com.sentinela.alpr.shared.event.DomainEventPublisher;
@@ -63,6 +65,14 @@ public class DetectionService {
 			content.add(toResponse(d));
 		}
 		return new DetectionPage(content, nextCursor);
+	}
+
+	@Transactional(readOnly = true)
+	public DetectionSummaryResponse summary() {
+		Instant now = Instant.now();
+		long lastHour = repository.countByDetectedAtGreaterThanEqual(now.minus(Duration.ofHours(1)));
+		long last24h = repository.countByDetectedAtGreaterThanEqual(now.minus(Duration.ofHours(24)));
+		return new DetectionSummaryResponse(lastHour, last24h);
 	}
 
 	private static int normalizeSize(Integer size) {

@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { Camera, CameraRequest, Page } from '../../shared/models/camera.model';
+import { Camera, CameraRequest, CameraSummary, Page } from '../../shared/models/camera.model';
 
 @Injectable({ providedIn: 'root' })
 export class CameraService {
@@ -28,5 +28,9 @@ export class CameraService {
 
   activate(id: number): Observable<void> {
     return this.http.post<void>(`${this.base}/${id}/activate`, {});
+  }
+
+  summary(): Observable<CameraSummary> {
+    return this.http.get<CameraSummary>(`${this.base}/summary`);
   }
 }

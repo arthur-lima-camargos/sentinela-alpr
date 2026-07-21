@@ -33,6 +33,11 @@ class AlertController {
 		return service.list(status, pageable);
 	}
 
+	@GetMapping("/summary")
+	AlertSummaryResponse summary() {
+		return service.summary();
+	}
+
 	@PatchMapping("/{id}")
 	AlertResponse updateStatus(@PathVariable Long id, @Valid @RequestBody AlertStatusRequest request) {
 		return service.updateStatus(id, request.status());

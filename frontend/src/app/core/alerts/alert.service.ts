@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { Alert, AlertStatus } from '../../shared/models/alert.model';
+import { Alert, AlertStatus, AlertSummary } from '../../shared/models/alert.model';
 import { Page } from '../../shared/models/page.model';
 
 @Injectable({ providedIn: 'root' })
@@ -20,5 +20,9 @@ export class AlertService {
 
   updateStatus(id: number, status: AlertStatus): Observable<Alert> {
     return this.http.patch<Alert>(`${this.base}/${id}`, { status });
+  }
+
+  summary(): Observable<AlertSummary> {
+    return this.http.get<AlertSummary>(`${this.base}/summary`);
   }
 }

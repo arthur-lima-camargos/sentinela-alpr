@@ -30,3 +30,7 @@ export interface WatchlistRequest {
 export interface WatchlistUpdateRequest {
   reason: WatchReason;
 }
+
+export interface WatchlistSummary {
+  active: number;
+}

@@ -18,3 +18,8 @@ export interface DetectionQuery {
   cursor?: string | null;
   size?: number;
 }
+
+export interface DetectionSummary {
+  lastHour: number;
+  last24h: number;
+}

@@ -9,3 +9,8 @@ export interface Alert {
   status: AlertStatus;
   createdAt: string;
 }
+
+export interface AlertSummary {
+  newCount: number;
+  seenCount: number;
+}

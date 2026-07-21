@@ -13,6 +13,7 @@ import com.sentinela.alpr.shared.error.NotFoundException;
 import com.sentinela.alpr.shared.support.PlateNormalizer;
 import com.sentinela.alpr.watchlist.api.WatchlistRequest;
 import com.sentinela.alpr.watchlist.api.WatchlistResponse;
+import com.sentinela.alpr.watchlist.api.WatchlistSummaryResponse;
 import com.sentinela.alpr.watchlist.api.WatchlistUpdateRequest;
 import com.sentinela.alpr.watchlist.infra.WatchedVehicleRepository;
 
@@ -44,6 +45,11 @@ public class WatchlistService {
 	@Transactional(readOnly = true)
 	public Page<WatchlistResponse> list(Pageable pageable) {
 		return repository.findAll(pageable).map(WatchlistService::toResponse);
+	}
+
+	@Transactional(readOnly = true)
+	public WatchlistSummaryResponse summary() {
+		return new WatchlistSummaryResponse(repository.countByActiveTrue());
 	}
 
 	@Transactional
